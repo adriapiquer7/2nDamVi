@@ -1,0 +1,26 @@
+MATERIAL DE L'EXAMEN - M0486 BA2 Hibernate (BrawlStars)
+
+Què hi ha:
+  modelDades/  Les classes del model amb els atributs ja picats (sense anotacions ni mètodes)
+               i els enums complets.
+  patroDao/    Main.java        Main d'autocorrecció. NO el modifiqueu.
+               DadesProva.java  Dades de prova i consultes de comprovació. NO el modifiqueu.
+               Correccio.java   Eina de comprovació i simulacre de puntuació. NO el modifiqueu.
+
+Què heu de fer vosaltres:
+  1. Crear el projecte Maven (GroupId i ArtifactId com diu l'enunciat), el pom.xml
+     i el hibernate.cfg.xml.
+  2. Copiar-hi aquestes carpetes dins de src/main/java.
+  3. Escriure SessionManager (amb getSessionFactory()), IGenericDao i GenericDao.
+  4. Completar el model: anotacions, herència, constructors, getters i setters
+     amb els noms que indica l'enunciat.
+  5. Crear la interfície IBrawlerDao i la classe BrawlerDao amb els 4 mètodes de l'enunciat.
+     Si encara no n'heu fet algun, creeu-lo buit (return null;) perquè el Main compili.
+
+Com fer servir el Main:
+  - Executeu-lo tantes vegades com vulgueu: reinicia les dades abans de cada prova.
+  - Cada comprovació mostra [OK] o [ERROR] amb el valor esperat i l'obtingut.
+    Al codi, els comentaris "Hauria de tornar" us diuen què s'espera.
+  - Al final mostra un SIMULACRE DE PUNTUACIÓ. És aproximat: NO és la nota de l'examen
+    i no substitueix la correcció de la professora. Només comprova una part de l'examen
+    (el que es pot veure executant el codi).

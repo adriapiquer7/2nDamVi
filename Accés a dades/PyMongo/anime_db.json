@@ -1,0 +1,787 @@
+[
+  {
+    "_id": "anim001",
+    "title": "Death Note",
+    "episodes": 37,
+    "year": 2006,
+    "type_format": "TV",
+    "genres": [
+      "Thriller",
+      "Supernatural"
+    ],
+    "mal_score": 8.62,
+    "status": "Finished Airing",
+    "is_sequel": false,
+    "synopsis": "A high school student discovers a supernatural notebook that kills anyone whose name is written in it.",
+    "seasons": 1,
+    "studio": {
+      "name": "Madhouse",
+      "country": "Japan",
+      "founded_year": 1972
+    },
+    "voice_cast": [
+      {
+        "actor": "Mamoru Miyano",
+        "character": "Light Yagami",
+        "language": "Japanese"
+      },
+      {
+        "actor": "Brad Swaile",
+        "character": "Light Yagami",
+        "language": "English"
+      }
+    ]
+  },
+  {
+    "_id": "anim002",
+    "title": "Hunter x Hunter (2011)",
+    "episodes": 148,
+    "year": 2011,
+    "type_format": "TV",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Fantasy"
+    ],
+    "mal_score": 9.04,
+    "status": "Finished Airing",
+    "is_sequel": false,
+    "synopsis": "Gon Freecss aspires to become a Hunter to find his father who abandoned him.",
+    "seasons": 6,
+    "studio": {
+      "name": "Madhouse",
+      "country": "Japan",
+      "founded_year": 1972
+    },
+    "voice_cast": [
+      {
+        "actor": "Megumi Han",
+        "character": "Gon Freecss",
+        "language": "Japanese"
+      },
+      {
+        "actor": "Erica Mendez",
+        "character": "Gon Freecss",
+        "language": "English"
+      }
+    ]
+  },
+  {
+    "_id": "anim003",
+    "title": "One Punch Man",
+    "episodes": 12,
+    "year": 2015,
+    "type_format": "TV",
+    "genres": [
+      "Action",
+      "Comedy"
+    ],
+    "mal_score": 8.5,
+    "status": "Finished Airing",
+    "is_sequel": false,
+    "synopsis": "Saitama is a hero who can defeat any opponent with a single punch but seeks a worthy challenge.",
+    "seasons": 1,
+    "studio": {
+      "name": "Madhouse",
+      "country": "Japan",
+      "founded_year": 1972
+    },
+    "voice_cast": [
+      {
+        "actor": "Makoto Furukawa",
+        "character": "Saitama",
+        "language": "Japanese"
+      }
+    ]
+  },
+  {
+    "_id": "anim004",
+    "title": "Fullmetal Alchemist: Brotherhood",
+    "episodes": 64,
+    "year": 2009,
+    "type_format": "TV",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Drama",
+      "Fantasy"
+    ],
+    "mal_score": 9.09,
+    "status": "Finished Airing",
+    "is_sequel": false,
+    "synopsis": "Two brothers search for a Philosopher's Stone after an attempt to revive their mother goes wrong.",
+    "seasons": 5,
+    "studio": {
+      "name": "Bones",
+      "country": "Japan",
+      "founded_year": 1998
+    },
+    "voice_cast": [
+      {
+        "actor": "Romi Park",
+        "character": "Edward Elric",
+        "language": "Japanese"
+      },
+      {
+        "actor": "Vic Mignogna",
+        "character": "Edward Elric",
+        "language": "English"
+      }
+    ]
+  },
+  {
+    "_id": "anim005",
+    "title": "My Hero Academia",
+    "episodes": 113,
+    "year": 2016,
+    "type_format": "TV",
+    "genres": [
+      "Action",
+      "Comedy",
+      "Superhero"
+    ],
+    "mal_score": 7.89,
+    "status": "Finished Airing",
+    "is_sequel": false,
+    "synopsis": "A boy born without superpowers in a world where they are common dreams of becoming a hero.",
+    "seasons": 7,
+    "studio": {
+      "name": "Bones",
+      "country": "Japan",
+      "founded_year": 1998
+    },
+    "voice_cast": [
+      {
+        "actor": "Daiki Yamashita",
+        "character": "Izuku Midoriya",
+        "language": "Japanese"
+      }
+    ]
+  },
+  {
+    "_id": "anim006",
+    "title": "Mob Psycho 100",
+    "episodes": 12,
+    "year": 2016,
+    "type_format": "TV",
+    "genres": [
+      "Action",
+      "Comedy",
+      "Supernatural"
+    ],
+    "mal_score": 8.47,
+    "status": "Finished Airing",
+    "is_sequel": false,
+    "synopsis": "A psychic middle school boy tries to live a normal life and keep his growing powers under control.",
+    "seasons": 1,
+    "studio": {
+      "name": "Bones",
+      "country": "Japan",
+      "founded_year": 1998
+    },
+    "voice_cast": [
+      {
+        "actor": "Setsuo Ito",
+        "character": "Shigeo Kageyama",
+        "language": "Japanese"
+      }
+    ]
+  },
+  {
+    "_id": "anim007",
+    "title": "Mob Psycho 100 II",
+    "episodes": 13,
+    "year": 2019,
+    "type_format": "TV",
+    "genres": [
+      "Action",
+      "Comedy",
+      "Supernatural"
+    ],
+    "mal_score": 8.81,
+    "status": "Finished Airing",
+    "is_sequel": true,
+    "synopsis": "Mob continues to face challenges from powerful psychics and grow as a person.",
+    "seasons": 1,
+    "studio": {
+      "name": "Bones",
+      "country": "Japan",
+      "founded_year": 1998
+    },
+    "voice_cast": [
+      {
+        "actor": "Setsuo Ito",
+        "character": "Shigeo Kageyama",
+        "language": "Japanese"
+      }
+    ]
+  },
+  {
+    "_id": "anim008",
+    "title": "Demon Slayer: Kimetsu no Yaiba",
+    "episodes": 26,
+    "year": 2019,
+    "type_format": "TV",
+    "genres": [
+      "Action",
+      "Fantasy",
+      "Supernatural"
+    ],
+    "mal_score": 8.45,
+    "status": "Finished Airing",
+    "is_sequel": false,
+    "synopsis": "A boy whose family is slaughtered by demons joins the Demon Slayer Corps to avenge them.",
+    "seasons": 1,
+    "studio": {
+      "name": "ufotable",
+      "country": "Japan",
+      "founded_year": 2000
+    },
+    "voice_cast": [
+      {
+        "actor": "Natsuki Hanae",
+        "character": "Tanjiro Kamado",
+        "language": "Japanese"
+      },
+      {
+        "actor": "Zach Aguilar",
+        "character": "Tanjiro Kamado",
+        "language": "English"
+      }
+    ]
+  },
+  {
+    "_id": "anim009",
+    "title": "Demon Slayer: Mugen Train",
+    "episodes": null,
+    "year": 2020,
+    "type_format": "Movie",
+    "genres": [
+      "Action",
+      "Fantasy",
+      "Supernatural"
+    ],
+    "mal_score": 8.23,
+    "status": "Finished Airing",
+    "is_sequel": true,
+    "duration_minutes": 117,
+    "synopsis": "Tanjiro and his companions join the Flame Hashira on a mission aboard the Mugen Train.",
+    "studio": {
+      "name": "ufotable",
+      "country": "Japan",
+      "founded_year": 2000
+    },
+    "voice_cast": [
+      {
+        "actor": "Natsuki Hanae",
+        "character": "Tanjiro Kamado",
+        "language": "Japanese"
+      }
+    ]
+  },
+  {
+    "_id": "anim010",
+    "title": "Attack on Titan",
+    "episodes": 25,
+    "year": 2013,
+    "type_format": "TV",
+    "genres": [
+      "Action",
+      "Drama",
+      "Fantasy"
+    ],
+    "mal_score": 8.54,
+    "status": "Finished Airing",
+    "is_sequel": false,
+    "synopsis": "Humanity lives inside cities surrounded by walls due to the threat of giant humanoid creatures.",
+    "seasons": 1,
+    "studio": {
+      "name": "Wit Studio",
+      "country": "Japan",
+      "founded_year": 2012
+    },
+    "voice_cast": [
+      {
+        "actor": "Yuki Kaji",
+        "character": "Eren Yeager",
+        "language": "Japanese"
+      },
+      {
+        "actor": "Bryce Papenbrook",
+        "character": "Eren Yeager",
+        "language": "English"
+      }
+    ]
+  },
+  {
+    "_id": "anim011",
+    "title": "Attack on Titan: The Final Season",
+    "episodes": 16,
+    "year": 2020,
+    "type_format": "TV",
+    "genres": [
+      "Action",
+      "Drama",
+      "Fantasy"
+    ],
+    "mal_score": 8.75,
+    "status": "Finished Airing",
+    "is_sequel": true,
+    "seasons": 1,
+    "studio": {
+      "name": "MAPPA",
+      "country": "Japan",
+      "founded_year": 2011
+    },
+    "voice_cast": [
+      {
+        "actor": "Yuki Kaji",
+        "character": "Eren Yeager",
+        "language": "Japanese"
+      }
+    ]
+  },
+  {
+    "_id": "anim012",
+    "title": "Jujutsu Kaisen",
+    "episodes": 24,
+    "year": 2020,
+    "type_format": "TV",
+    "genres": [
+      "Action",
+      "Fantasy",
+      "Supernatural"
+    ],
+    "mal_score": 8.61,
+    "status": "Finished Airing",
+    "is_sequel": false,
+    "synopsis": "A boy swallows a cursed talisman and joins a school of sorcerers to find the remaining pieces.",
+    "seasons": 1,
+    "studio": {
+      "name": "MAPPA",
+      "country": "Japan",
+      "founded_year": 2011
+    },
+    "voice_cast": [
+      {
+        "actor": "Junya Enoki",
+        "character": "Yuji Itadori",
+        "language": "Japanese"
+      },
+      {
+        "actor": "Adam McArthur",
+        "character": "Yuji Itadori",
+        "language": "English"
+      }
+    ]
+  },
+  {
+    "_id": "anim013",
+    "title": "Chainsaw Man",
+    "episodes": 12,
+    "year": 2022,
+    "type_format": "TV",
+    "genres": [
+      "Action",
+      "Fantasy",
+      "Horror"
+    ],
+    "mal_score": 8.26,
+    "status": "Finished Airing",
+    "is_sequel": false,
+    "synopsis": "A young man merges with a devil and becomes a hybrid with chainsaw powers.",
+    "seasons": 1,
+    "studio": {
+      "name": "MAPPA",
+      "country": "Japan",
+      "founded_year": 2011
+    },
+    "voice_cast": [
+      {
+        "actor": "Kikunosuke Toya",
+        "character": "Denji",
+        "language": "Japanese"
+      }
+    ]
+  },
+  {
+    "_id": "anim014",
+    "title": "Your Name",
+    "episodes": null,
+    "year": 2016,
+    "type_format": "Movie",
+    "genres": [
+      "Romance",
+      "Drama",
+      "Fantasy"
+    ],
+    "mal_score": 8.85,
+    "status": "Finished Airing",
+    "is_sequel": false,
+    "duration_minutes": 107,
+    "synopsis": "Two strangers find themselves linked in a bizarre way through their dreams.",
+    "studio": {
+      "name": "CoMix Wave Films",
+      "country": "Japan",
+      "founded_year": 2007
+    },
+    "voice_cast": [
+      {
+        "actor": "Ryunosuke Kamiki",
+        "character": "Taki Tachibana",
+        "language": "Japanese"
+      },
+      {
+        "actor": "Mone Kamishiraishi",
+        "character": "Mitsuha Miyamizu",
+        "language": "Japanese"
+      }
+    ]
+  },
+  {
+    "_id": "anim015",
+    "title": "Weathering with You",
+    "episodes": null,
+    "year": 2019,
+    "type_format": "Movie",
+    "genres": [
+      "Romance",
+      "Drama",
+      "Fantasy"
+    ],
+    "mal_score": 8.28,
+    "status": "Finished Airing",
+    "is_sequel": false,
+    "duration_minutes": 112,
+    "synopsis": "A runaway teenager and a girl with the power to control weather must choose between love and duty.",
+    "studio": {
+      "name": "CoMix Wave Films",
+      "country": "Japan",
+      "founded_year": 2007
+    },
+    "voice_cast": [
+      {
+        "actor": "Kotaro Daigo",
+        "character": "Hodaka Morishima",
+        "language": "Japanese"
+      }
+    ]
+  },
+  {
+    "_id": "anim016",
+    "title": "Spy x Family",
+    "episodes": 12,
+    "year": 2022,
+    "type_format": "TV",
+    "genres": [
+      "Action",
+      "Comedy"
+    ],
+    "mal_score": 8.5,
+    "status": "Finished Airing",
+    "is_sequel": false,
+    "synopsis": "A spy forms a fake family with an assassin and a telepath for a covert mission.",
+    "seasons": 1,
+    "studio": {
+      "name": "Wit Studio",
+      "country": "Japan",
+      "founded_year": 2012
+    },
+    "voice_cast": [
+      {
+        "actor": "Takuya Eguchi",
+        "character": "Loid Forger",
+        "language": "Japanese"
+      },
+      {
+        "actor": "Atsumi Tanezaki",
+        "character": "Anya Forger",
+        "language": "Japanese"
+      }
+    ]
+  },
+  {
+    "_id": "anim017",
+    "title": "Spy x Family Season 2",
+    "episodes": 12,
+    "year": 2023,
+    "type_format": "TV",
+    "genres": [
+      "Action",
+      "Comedy"
+    ],
+    "mal_score": 8.16,
+    "status": "Finished Airing",
+    "is_sequel": true,
+    "seasons": 1,
+    "studio": {
+      "name": "Wit Studio",
+      "country": "Japan",
+      "founded_year": 2012
+    },
+    "voice_cast": [
+      {
+        "actor": "Takuya Eguchi",
+        "character": "Loid Forger",
+        "language": "Japanese"
+      }
+    ]
+  },
+  {
+    "_id": "anim018",
+    "title": "Violet Evergarden",
+    "episodes": 13,
+    "year": 2018,
+    "type_format": "TV",
+    "genres": [
+      "Drama",
+      "Fantasy",
+      "Slice of Life"
+    ],
+    "mal_score": 8.54,
+    "status": "Finished Airing",
+    "is_sequel": false,
+    "synopsis": "A former soldier learns about emotions while ghostwriting letters for others.",
+    "seasons": 1,
+    "studio": {
+      "name": "Kyoto Animation",
+      "country": "Japan",
+      "founded_year": 1981
+    },
+    "voice_cast": [
+      {
+        "actor": "Yui Ishikawa",
+        "character": "Violet Evergarden",
+        "language": "Japanese"
+      }
+    ]
+  },
+  {
+    "_id": "anim019",
+    "title": "A Silent Voice",
+    "episodes": null,
+    "year": 2016,
+    "type_format": "Movie",
+    "genres": [
+      "Drama",
+      "Romance",
+      "Slice of Life"
+    ],
+    "mal_score": 8.94,
+    "status": "Finished Airing",
+    "is_sequel": false,
+    "duration_minutes": 130,
+    "synopsis": "A young man seeks redemption by reconnecting with a deaf girl he bullied in elementary school.",
+    "studio": {
+      "name": "Kyoto Animation",
+      "country": "Japan",
+      "founded_year": 1981
+    },
+    "voice_cast": [
+      {
+        "actor": "Miyu Irino",
+        "character": "Shoya Ishida",
+        "language": "Japanese"
+      },
+      {
+        "actor": "Saori Hayami",
+        "character": "Shoko Nishimiya",
+        "language": "Japanese"
+      }
+    ]
+  },
+  {
+    "_id": "anim020",
+    "title": "Steins;Gate",
+    "episodes": 24,
+    "year": 2011,
+    "type_format": "TV",
+    "genres": [
+      "Thriller",
+      "Sci-Fi",
+      "Drama"
+    ],
+    "mal_score": 9.07,
+    "status": "Finished Airing",
+    "is_sequel": false,
+    "synopsis": "A self-proclaimed mad scientist accidentally discovers time travel and must deal with the consequences.",
+    "seasons": 1,
+    "studio": {
+      "name": "White Fox",
+      "country": "Japan",
+      "founded_year": 2007
+    },
+    "voice_cast": [
+      {
+        "actor": "Mamoru Miyano",
+        "character": "Rintaro Okabe",
+        "language": "Japanese"
+      },
+      {
+        "actor": "J. Michael Tatum",
+        "character": "Rintaro Okabe",
+        "language": "English"
+      }
+    ]
+  },
+  {
+    "_id": "anim021",
+    "title": "Cowboy Bebop",
+    "episodes": 26,
+    "year": 1998,
+    "type_format": "TV",
+    "genres": [
+      "Action",
+      "Sci-Fi",
+      "Drama"
+    ],
+    "mal_score": 8.75,
+    "status": "Finished Airing",
+    "is_sequel": false,
+    "synopsis": "A ragtag group of bounty hunters aboard a spaceship chase criminals across the solar system.",
+    "seasons": 1,
+    "studio": {
+      "name": "Sunrise",
+      "country": "Japan",
+      "founded_year": 1972
+    },
+    "voice_cast": [
+      {
+        "actor": "Koichi Yamadera",
+        "character": "Spike Spiegel",
+        "language": "Japanese"
+      },
+      {
+        "actor": "Steve Blum",
+        "character": "Spike Spiegel",
+        "language": "English"
+      }
+    ]
+  },
+  {
+    "_id": "anim022",
+    "title": "Neon Genesis Evangelion",
+    "episodes": 26,
+    "year": 1995,
+    "type_format": "TV",
+    "genres": [
+      "Action",
+      "Sci-Fi",
+      "Drama",
+      "Mecha"
+    ],
+    "mal_score": 8.35,
+    "status": "Finished Airing",
+    "is_sequel": false,
+    "synopsis": "Teenagers pilot giant mechas to protect Earth from mysterious beings called Angels.",
+    "seasons": 1,
+    "studio": {
+      "name": "Gainax",
+      "country": "Japan",
+      "founded_year": 1984
+    },
+    "voice_cast": [
+      {
+        "actor": "Megumi Ogata",
+        "character": "Shinji Ikari",
+        "language": "Japanese"
+      }
+    ]
+  },
+  {
+    "_id": "anim023",
+    "title": "Spirited Away",
+    "episodes": null,
+    "year": 2001,
+    "type_format": "Movie",
+    "genres": [
+      "Adventure",
+      "Fantasy",
+      "Supernatural"
+    ],
+    "mal_score": 8.78,
+    "status": "Finished Airing",
+    "is_sequel": false,
+    "duration_minutes": 125,
+    "synopsis": "A girl enters a world of spirits and must work in a bathhouse to free herself and her parents.",
+    "studio": {
+      "name": "Studio Ghibli",
+      "country": "Japan",
+      "founded_year": 1985
+    },
+    "voice_cast": [
+      {
+        "actor": "Rumi Hiiragi",
+        "character": "Chihiro",
+        "language": "Japanese"
+      },
+      {
+        "actor": "Daveigh Chase",
+        "character": "Chihiro",
+        "language": "English"
+      }
+    ]
+  },
+  {
+    "_id": "anim024",
+    "title": "Princess Mononoke",
+    "episodes": null,
+    "year": 1997,
+    "type_format": "Movie",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Fantasy"
+    ],
+    "mal_score": 8.67,
+    "status": "Finished Airing",
+    "is_sequel": false,
+    "duration_minutes": 134,
+    "synopsis": "A prince becomes involved in a struggle between forest gods and a mining colony.",
+    "studio": {
+      "name": "Studio Ghibli",
+      "country": "Japan",
+      "founded_year": 1985
+    },
+    "voice_cast": [
+      {
+        "actor": "Yoji Matsuda",
+        "character": "Ashitaka",
+        "language": "Japanese"
+      },
+      {
+        "actor": "Billy Crudup",
+        "character": "Ashitaka",
+        "language": "English"
+      }
+    ]
+  },
+  {
+    "_id": "anim025",
+    "title": "Jujutsu Kaisen Season 2",
+    "episodes": 23,
+    "year": 2023,
+    "type_format": "TV",
+    "genres": [
+      "Action",
+      "Fantasy",
+      "Supernatural"
+    ],
+    "mal_score": 8.49,
+    "status": "Finished Airing",
+    "is_sequel": true,
+    "seasons": 1,
+    "studio": {
+      "name": "MAPPA",
+      "country": "Japan",
+      "founded_year": 2011
+    },
+    "voice_cast": [
+      {
+        "actor": "Junya Enoki",
+        "character": "Yuji Itadori",
+        "language": "Japanese"
+      }
+    ]
+  }
+]
