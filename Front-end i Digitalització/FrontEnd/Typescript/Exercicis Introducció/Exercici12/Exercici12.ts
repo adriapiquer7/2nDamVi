@@ -3,20 +3,23 @@ type estudiant1 = {
     nom: string,
     correu:string
 }
-type estudiant2 = {
+type position = {
     x:number,
     y:number
 }
-const xOrigen:number = 0
-const yOrigen:number=0
 let inputX : HTMLInputElement =document.getElementById("x") as HTMLInputElement
 let inputY : HTMLInputElement =document.getElementById("y") as HTMLInputElement
 let resultat : HTMLParagraphElement = document.getElementById("resultat") as HTMLParagraphElement
 function calcular(){
-    let valorCalcul:number=Math.sqrt((xOrigen-inputX.valueAsNumber)**2+(yOrigen-inputY.valueAsNumber)**2)
+    let puntsXY : position = {
+        x:inputX.valueAsNumber,
+        y:inputY.valueAsNumber
+    }
+    let valorCalcul:number=Math.sqrt((0-puntsXY.x)**2+(0-puntsXY.y)**2)
     resultat.innerText="Distancia des de l'origen: "+valorCalcul.toFixed(2)
 }
 function mostrar(){
+    resultat.innerText="";
     let estudiant1 : estudiant1 = {
         id:1,
         nom:"Pepe",

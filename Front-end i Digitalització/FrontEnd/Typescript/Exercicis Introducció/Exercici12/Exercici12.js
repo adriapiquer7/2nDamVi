@@ -1,14 +1,17 @@
 "use strict";
-const xOrigen = 0;
-const yOrigen = 0;
 let inputX = document.getElementById("x");
 let inputY = document.getElementById("y");
 let resultat = document.getElementById("resultat");
 function calcular() {
-    let valorCalcul = Math.sqrt((xOrigen - inputX.valueAsNumber) ** 2 + (yOrigen - inputY.valueAsNumber) ** 2);
+    let puntsXY = {
+        x: inputX.valueAsNumber,
+        y: inputY.valueAsNumber
+    };
+    let valorCalcul = Math.sqrt((0 - puntsXY.x) ** 2 + (0 - puntsXY.y) ** 2);
     resultat.innerText = "Distancia des de l'origen: " + valorCalcul.toFixed(2);
 }
 function mostrar() {
+    resultat.innerText = "";
     let estudiant1 = {
         id: 1,
         nom: "Pepe",
