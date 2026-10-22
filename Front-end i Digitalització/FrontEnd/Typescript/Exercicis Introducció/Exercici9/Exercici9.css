@@ -1,0 +1,10 @@
+#quadrat{
+    width: 100px;
+    height: 100px;
+    background-color: lime;
+}
+
+.classe1{
+    border: solid 5px fuchsia;
+    translate: 50px;
+}

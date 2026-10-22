@@ -1,10 +1,12 @@
+"use strict";
 function canviarOrdre() {
-    var txtArea = document.getElementById("txtArea");
-    var resultat = document.getElementById("resultat");
-    var arrayParaules = [];
-    var texto = txtArea.value.split(" ");
+    let txtArea = document.getElementById("txtArea");
+    let resultat = document.getElementById("resultat");
+    let arrayParaules = [];
+    let texto = txtArea.value.split(" ");
     texto.reverse();
-    for (var i = 0; i < texto.length; i++) {
+    for (let i = 0; i < texto.length; i++) {
         resultat.innerText += texto[i];
     }
 }
+//# sourceMappingURL=Exercici4.js.map

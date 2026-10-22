@@ -1,30 +1,29 @@
-"use strict";
-let inputX = document.getElementById("x");
-let inputY = document.getElementById("y");
-let resultat = document.getElementById("resultat");
+var inputX = document.getElementById("x");
+var inputY = document.getElementById("y");
+var resultat = document.getElementById("resultat");
 function calcular() {
-    let puntsXY = {
+    var puntsXY = {
         x: inputX.valueAsNumber,
         y: inputY.valueAsNumber
     };
-    let valorCalcul = Math.sqrt((0 - puntsXY.x) ** 2 + (0 - puntsXY.y) ** 2);
+    var valorCalcul = Math.sqrt(Math.pow((0 - puntsXY.x), 2) + Math.pow((0 - puntsXY.y), 2));
     resultat.innerText = "Distancia des de l'origen: " + valorCalcul.toFixed(2);
 }
 function mostrar() {
     resultat.innerText = "";
-    let estudiant1 = {
+    var estudiant1 = {
         id: 1,
         nom: "Pepe",
         correu: "correu@gmail.com"
     };
-    let estudiant2 = {
+    var estudiant2 = {
         id: 2,
         nom: "Pepa",
         correu: "correuPepa@gmail.com"
     };
-    let arrayTupla = [estudiant1, estudiant2];
-    for (const estudiant of arrayTupla) {
+    var arrayTupla = [estudiant1, estudiant2];
+    for (var _i = 0, arrayTupla_1 = arrayTupla; _i < arrayTupla_1.length; _i++) {
+        var estudiant = arrayTupla_1[_i];
         resultat.innerText += "ESTUDIANT" + estudiant.id + "\nID Estudiant: " + estudiant.id + ",\nNom Estudiant: " + estudiant.nom + ",\nCorreu Estudiant: " + estudiant.correu + "\n";
     }
 }
-//# sourceMappingURL=Exercici12.js.map
