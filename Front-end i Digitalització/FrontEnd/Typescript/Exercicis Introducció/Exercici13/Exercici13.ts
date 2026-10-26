@@ -1,25 +1,28 @@
-type vehicles = {
+type patinet = {
     fabricant : string,
     model: string,
-    carrega ?: number
-    tipus : string
+    carrega : number
 }
+type bicicleta = {
+    fabricant : string,
+    model: string
+}
+
+type vehicles = patinet | bicicleta
 
 let p : HTMLParagraphElement = document.getElementById("resultat") as HTMLParagraphElement
 let arrayVehicles: vehicles[] = []
 function mostrar(){
     p.innerText = "Mostrant les dades"
-    for (const vehicle of arrayVehicles) {
-        if (vehicle.tipus === "bicicleta"){
-            if (vehicle.carrega!==0){
-                p.innerText+= `\nBicibleta del fabricant: ${vehicle.fabricant}, model: ${vehicle.model} i temps de carrega: ${vehicle.carrega}`
-            }
-            else{
-                p.innerText+= `\nBicibleta del fabricant: ${vehicle.fabricant}, model: ${vehicle.model}`
-            }
+    for (let i = 0; i < arrayVehicles.length; i++) {
+        let vehicle : vehicles = arrayVehicles[i];
+        if("carrega" in vehicle){
+            p.innerText="Fabricant:"+vehicle.fabricant+", Model: "+vehicle.model+", Temps de carrega: "+vehicle.carrega
+            p.innerHTML="<br>"
         }
         else{
-            p.innerText+= `\nPatinet del fabricant: ${vehicle.fabricant}, model: ${vehicle.model} i temps de carrega: ${vehicle.carrega}`
+            p.innerText="Fabricant:"+vehicle.fabricant+", Model: "+vehicle.model
+            p.innerHTML="<br>"
         }
     }
 }
@@ -30,31 +33,19 @@ function guardar(){
     let carrega : HTMLInputElement = document.getElementById("carrega") as HTMLInputElement
 
     if(tipus.selectedIndex===0){
-        if (carrega.valueAsNumber!==0){
-            let bici:vehicles ={
-                fabricant : fabricant.value,
-                model : model.value,
-                carrega : carrega.valueAsNumber,
-                tipus: "bicicleta"
-            }
-            arrayVehicles.push(bici)
+        let bici:bicicleta ={
+            fabricant : fabricant.value,
+            model : model.value
         }
-        else{
-            let bici:vehicles ={
-                fabricant : fabricant.value,
-                model : model.value,
-                tipus: "bicicleta"
-            }
-            arrayVehicles.push(bici)
-        }
+        arrayVehicles.push(bici)
     }
     else{
-        let pati : vehicles = {
+        let pati : patinet = {
             fabricant: fabricant.value,
             model: model.value,
-            carrega: carrega.valueAsNumber,
-            tipus: "patinet"
+            carrega: carrega.valueAsNumber
         }
         arrayVehicles.push(pati)
     }
+    p.innerText="S'han guardat les dades"
 }

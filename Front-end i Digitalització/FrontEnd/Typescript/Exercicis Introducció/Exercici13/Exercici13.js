@@ -1,54 +1,38 @@
-"use strict";
-let p = document.getElementById("resultat");
-let arrayVehicles = [];
+var p = document.getElementById("resultat");
+var arrayVehicles = [];
 function mostrar() {
     p.innerText = "Mostrant les dades";
-    for (const vehicle of arrayVehicles) {
-        if (vehicle.tipus === "bicicleta") {
-            if (vehicle.carrega !== 0) {
-                p.innerText += `\nBicibleta del fabricant: ${vehicle.fabricant}, model: ${vehicle.model} i temps de carrega: ${vehicle.carrega}`;
-            }
-            else {
-                p.innerText += `\nBicibleta del fabricant: ${vehicle.fabricant}, model: ${vehicle.model}`;
-            }
+    for (var i = 0; i < arrayVehicles.length; i++) {
+        var vehicle = arrayVehicles[i];
+        if ("carrega" in vehicle) {
+            p.innerText = "Fabricant:" + vehicle.fabricant + ", Model: " + vehicle.model + ", Temps de carrega: " + vehicle.carrega;
+            p.innerHTML = "<br>";
         }
         else {
-            p.innerText += `\nPatinet del fabricant: ${vehicle.fabricant}, model: ${vehicle.model} i temps de carrega: ${vehicle.carrega}`;
+            p.innerText = "Fabricant:" + vehicle.fabricant + ", Model: " + vehicle.model;
+            p.innerHTML = "<br>";
         }
     }
 }
 function guardar() {
-    let fabricant = document.getElementById("fabricant");
-    let model = document.getElementById("model");
-    let tipus = document.getElementById("tipus");
-    let carrega = document.getElementById("carrega");
+    var fabricant = document.getElementById("fabricant");
+    var model = document.getElementById("model");
+    var tipus = document.getElementById("tipus");
+    var carrega = document.getElementById("carrega");
     if (tipus.selectedIndex === 0) {
-        if (carrega.valueAsNumber !== 0) {
-            let bici = {
-                fabricant: fabricant.value,
-                model: model.value,
-                carrega: carrega.valueAsNumber,
-                tipus: "bicicleta"
-            };
-            arrayVehicles.push(bici);
-        }
-        else {
-            let bici = {
-                fabricant: fabricant.value,
-                model: model.value,
-                tipus: "bicicleta"
-            };
-            arrayVehicles.push(bici);
-        }
+        var bici = {
+            fabricant: fabricant.value,
+            model: model.value
+        };
+        arrayVehicles.push(bici);
     }
     else {
-        let pati = {
+        var pati = {
             fabricant: fabricant.value,
             model: model.value,
-            carrega: carrega.valueAsNumber,
-            tipus: "patinet"
+            carrega: carrega.valueAsNumber
         };
         arrayVehicles.push(pati);
     }
+    p.innerText = "S'han guardat les dades";
 }
-//# sourceMappingURL=Exercici13.js.map
