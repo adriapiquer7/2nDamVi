@@ -1,4 +1,4 @@
-package SpringROA.SpringROA;
+package SpringROA.SpringROA.model;
 
 import java.util.ArrayList;
 import java.util.List;

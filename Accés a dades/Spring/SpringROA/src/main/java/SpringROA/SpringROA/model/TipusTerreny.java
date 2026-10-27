@@ -1,4 +1,4 @@
-package SpringROA.SpringROA;
+package SpringROA.SpringROA.model;
 
 public enum TipusTerreny {
 	BOSC(TipusRecurs.FUSTA),

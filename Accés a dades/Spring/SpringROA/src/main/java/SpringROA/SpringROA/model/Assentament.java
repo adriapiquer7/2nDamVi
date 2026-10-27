@@ -1,4 +1,4 @@
-package SpringROA.SpringROA;
+package SpringROA.SpringROA.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

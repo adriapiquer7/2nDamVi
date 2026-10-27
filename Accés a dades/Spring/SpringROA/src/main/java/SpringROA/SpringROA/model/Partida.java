@@ -1,4 +1,4 @@
-package SpringROA.SpringROA;
+package SpringROA.SpringROA.model;
 
 import java.time.LocalDate;
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package SpringROA.SpringROA;
+package SpringROA.SpringROA.exception;
 
 /**
  * Error de regla de joc (torn incorrecte, recursos insuficients, etc.).

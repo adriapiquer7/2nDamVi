@@ -1,4 +1,4 @@
-package SpringROA.SpringROA;
+package SpringROA.SpringROA.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

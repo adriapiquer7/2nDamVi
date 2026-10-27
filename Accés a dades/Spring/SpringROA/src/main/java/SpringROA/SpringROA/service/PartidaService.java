@@ -1,4 +1,4 @@
-package SpringROA.SpringROA;
+package SpringROA.SpringROA.service;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,7 +11,21 @@ import java.util.Random;
 
 import org.hibernate.Session;
 
-public class PartidaDAO extends GenericDao<Partida, Integer> {
+import SpringROA.SpringROA.GenericDao;
+import SpringROA.SpringROA.exception.JocException;
+import SpringROA.SpringROA.model.Assentament;
+import SpringROA.SpringROA.model.Ciutat;
+import SpringROA.SpringROA.model.ColorJugador;
+import SpringROA.SpringROA.model.EstatPartida;
+import SpringROA.SpringROA.model.Hexagon;
+import SpringROA.SpringROA.model.HexagonVertex;
+import SpringROA.SpringROA.model.Jugador;
+import SpringROA.SpringROA.model.Partida;
+import SpringROA.SpringROA.model.TipusRecurs;
+import SpringROA.SpringROA.model.TipusTerreny;
+import SpringROA.SpringROA.model.Vertex;
+
+public class PartidaService extends GenericDao<Partida, Integer> {
 
 	private static final int PUNTS_PER_DEFECTE = 10;
 	private final Random random = new Random();

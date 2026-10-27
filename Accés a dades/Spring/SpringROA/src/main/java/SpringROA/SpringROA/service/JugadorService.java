@@ -1,4 +1,4 @@
-package SpringROA.SpringROA;
+package SpringROA.SpringROA.service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,7 +7,22 @@ import java.util.Map;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 
-public class JugadorDAO extends GenericDao<Jugador, Integer> {
+import SpringROA.SpringROA.GenericDao;
+import SpringROA.SpringROA.exception.JocException;
+import SpringROA.SpringROA.model.Aresta;
+import SpringROA.SpringROA.model.Assentament;
+import SpringROA.SpringROA.model.Carretera;
+import SpringROA.SpringROA.model.Ciutat;
+import SpringROA.SpringROA.model.EstatPartida;
+import SpringROA.SpringROA.model.Hexagon;
+import SpringROA.SpringROA.model.Jugador;
+import SpringROA.SpringROA.model.Partida;
+import SpringROA.SpringROA.model.Poblat;
+import SpringROA.SpringROA.model.RecursJugador;
+import SpringROA.SpringROA.model.TipusRecurs;
+import SpringROA.SpringROA.model.Vertex;
+
+public class JugadorService extends GenericDao<Jugador, Integer> {
 
 	static final int LIMIT_CARRETERES = 15;
 	static final int LIMIT_POBLATS = 5;

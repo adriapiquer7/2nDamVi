@@ -1,8 +1,13 @@
-package SpringROA.SpringROA;
+package SpringROA.SpringROA.service;
 
 import java.util.List;
 
 import org.hibernate.Session;
+
+import SpringROA.SpringROA.exception.JocException;
+import SpringROA.SpringROA.model.EstatPartida;
+import SpringROA.SpringROA.model.Jugador;
+import SpringROA.SpringROA.model.Partida;
 
 /** Consultes JPQL i regles de puntuació compartides pels DAO. */
 final class Consultes {

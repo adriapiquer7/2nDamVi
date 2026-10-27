@@ -1,4 +1,4 @@
-package SpringROA.SpringROA;
+package SpringROA.SpringROA.service;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -10,6 +10,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.Session;
+
+import SpringROA.SpringROA.exception.JocException;
+import SpringROA.SpringROA.model.Aresta;
+import SpringROA.SpringROA.model.Hexagon;
+import SpringROA.SpringROA.model.HexagonVertex;
+import SpringROA.SpringROA.model.Partida;
+import SpringROA.SpringROA.model.TipusTerreny;
+import SpringROA.SpringROA.model.Vertex;
 
 /**
  * Carrega la topologia del tauler des dels CSV de la carpeta "csv" (a l'arrel del projecte).
