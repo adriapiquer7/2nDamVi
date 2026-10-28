@@ -9,9 +9,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import SpringROA.SpringROA.GenericDao;
 import SpringROA.SpringROA.exception.JocException;
 import SpringROA.SpringROA.model.Assentament;
 import SpringROA.SpringROA.model.Ciutat;
@@ -24,14 +25,21 @@ import SpringROA.SpringROA.model.Partida;
 import SpringROA.SpringROA.model.TipusRecurs;
 import SpringROA.SpringROA.model.TipusTerreny;
 import SpringROA.SpringROA.model.Vertex;
+import SpringROA.SpringROA.repository.PartidaRepository;
+import jakarta.persistence.EntityManager;
 
 @Service
-public class PartidaService extends GenericDao<Partida, Integer> {
-
+public class PartidaService{
+	
+	@Autowired
+	private PartidaRepository partidaRepository;
+	@Autowired
+	private EntityManager entityManager;
 	private static final int PUNTS_PER_DEFECTE = 10;
 	private final Random random = new Random();
 
 	/** Crea una partida nova: jugadors, tauler, terrenys, números i lladre al desert */
+	@Transactional
 	public int iniciarPartida(List<String> nomsJugadors, Integer puntsPerGuanyar) {
 		if (nomsJugadors == null || nomsJugadors.size() < 2 || nomsJugadors.size() > 4) {
 			throw new JocException("Hi ha d'haver entre 2 i 4 jugadors");
@@ -92,6 +100,7 @@ public class PartidaService extends GenericDao<Partida, Integer> {
 	}
 
 	/** Mostra hexàgons, número, lladre i construccions de cada vèrtex */
+	@Transactional
 	public void mostrarTauler(int idPartida) {
 		executar(s -> {
 			Partida p = Consultes.carregarPartida(s, idPartida);
@@ -125,6 +134,7 @@ public class PartidaService extends GenericDao<Partida, Integer> {
 	}
 
 	/** Mostra estat, ronda, actiu, última tirada i la situació de cada jugador */
+	@Transactional
 	public void mostrarPartida(int idPartida) {
 		executar(s -> {
 			Partida p = Consultes.carregarPartida(s, idPartida);
@@ -150,6 +160,7 @@ public class PartidaService extends GenericDao<Partida, Integer> {
 	 * Tira els daus i fa la producció. Per cada hexàgon amb el número (sense lladre),
 	 * cada poblat dona 1 recurs i cada ciutat 2 al propietari.
 	 */
+	@Transactional
 	public String tirarDaus(int idPartida) {
 		return executar(s -> {
 			Partida p = Consultes.carregarPartida(s, idPartida);
@@ -213,14 +224,14 @@ public class PartidaService extends GenericDao<Partida, Integer> {
 	}
 
 	/** Comprova si algun jugador ha arribat als punts per guanyar */
+	@Transactional
 	public void comprovarVictoria(int idPartida) {
-		executar(s -> {
-			Consultes.comprovarVictoria(s, Consultes.carregarPartida(s, idPartida));
-			return null;
-		});
+		Partida partida = retornarPartidaById(idPartida);
+		Consultes.comprovarVictoria(entityManager, partida);
 	}
 
 	/** Ids de les arestes que toquen un vèrtex */
+	@Transactional
 	public List<Integer> arestesAdjacents(int idVertex) {
 		return executar(s -> s.createQuery(
 				"SELECT ar.id FROM Aresta ar WHERE ar.vertexA.id = :v OR ar.vertexB.id = :v", Integer.class)
@@ -228,14 +239,22 @@ public class PartidaService extends GenericDao<Partida, Integer> {
 	}
 
 	/** Id del jugador actiu, o null si encara no n'hi ha */
+	@Transactional(readOnly = true)
 	public Integer idJugadorActiu(int idPartida) {
-		return executar(s -> {
-			Partida p = Consultes.carregarPartida(s, idPartida);
-			return p.getActiu() == null ? null : p.getActiu().getId();
-		});
+		Jugador j = retornarPartidaById(idPartida).getActiu();
+		if(j!=null) {
+			return j.getId();
+		}
+		else
+			return null;
 	}
 
+	@Transactional(readOnly = true)
 	public EstatPartida estat(int idPartida) {
-		return executar(s -> Consultes.carregarPartida(s, idPartida).getEstat());
+		return retornarPartidaById(idPartida).getEstat();
+	}
+	
+	private Partida retornarPartidaById(int idPartida) {
+		return partidaRepository.findById(idPartida).orElseThrow(()->new JocException("No existeix la partida " + idPartida));
 	}
 }
