@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import org.hibernate.Session;
+import org.springframework.stereotype.Service;
 
 import SpringROA.SpringROA.GenericDao;
 import SpringROA.SpringROA.exception.JocException;
@@ -25,6 +25,7 @@ import SpringROA.SpringROA.model.TipusRecurs;
 import SpringROA.SpringROA.model.TipusTerreny;
 import SpringROA.SpringROA.model.Vertex;
 
+@Service
 public class PartidaService extends GenericDao<Partida, Integer> {
 
 	private static final int PUNTS_PER_DEFECTE = 10;

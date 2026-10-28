@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.hibernate.Session;
 import org.hibernate.query.Query;
+import org.springframework.stereotype.Service;
 
 import SpringROA.SpringROA.GenericDao;
 import SpringROA.SpringROA.exception.JocException;
@@ -22,6 +23,7 @@ import SpringROA.SpringROA.model.RecursJugador;
 import SpringROA.SpringROA.model.TipusRecurs;
 import SpringROA.SpringROA.model.Vertex;
 
+@Service
 public class JugadorService extends GenericDao<Jugador, Integer> {
 
 	static final int LIMIT_CARRETERES = 15;

@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.Session;
+import org.springframework.stereotype.Service;
 
 import SpringROA.SpringROA.exception.JocException;
 import SpringROA.SpringROA.model.Aresta;
@@ -29,6 +30,7 @@ import SpringROA.SpringROA.model.Vertex;
  *   arestes.csv        id;vertexA;vertexB       (ids del CSV)
  * Cal revisar-ho contra els fitxers reals.
  */
+@Service
 final class TopologiaCSV {
 
 	static final String DIRECTORI = "csv";
