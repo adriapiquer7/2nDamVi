@@ -1,21 +1,22 @@
-import { Videojoc } from "./Exercici22.js";
-let arrayTupla = [];
-let inputTitol = document.getElementById("titol");
-let inputGenere = document.getElementById("genere");
-let inputPlataforma = document.getElementById("plataforma");
-let inputPreu = document.getElementById("preu");
-let botoCrear = document.getElementById("crearNouJoc");
-let botoMostrar = document.getElementById("mostrarJoc");
-let p = document.getElementById("resultat");
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var Exercici22_js_1 = require("./Exercici22.js");
+var arrayTupla = [];
+var inputTitol = document.getElementById("titol");
+var inputGenere = document.getElementById("genere");
+var inputPlataforma = document.getElementById("plataforma");
+var inputPreu = document.getElementById("preu");
+var botoCrear = document.getElementById("crearNouJoc");
+var botoMostrar = document.getElementById("mostrarJoc");
+var p = document.getElementById("resultat");
 botoCrear.onclick = crear;
 botoMostrar.onclick = mostrar;
 function crear() {
-    let videojoc1 = new Videojoc(inputTitol.value, inputGenere.value, inputPlataforma.value, inputPreu.valueAsNumber);
+    var videojoc1 = new Exercici22_js_1.Videojoc(inputTitol.value, inputGenere.value, inputPlataforma.value, inputPreu.valueAsNumber);
     arrayTupla.push(videojoc1);
 }
 function mostrar() {
-    for (let i = 0; i < arrayTupla.length; i++) {
+    for (var i = 0; i < arrayTupla.length; i++) {
         p.innerText += arrayTupla[i].toString() + "\n";
     }
 }
-//# sourceMappingURL=fitxerExercici22.js.map
