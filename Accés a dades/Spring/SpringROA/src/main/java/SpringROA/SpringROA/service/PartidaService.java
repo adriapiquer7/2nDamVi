@@ -25,6 +25,7 @@ import SpringROA.SpringROA.model.Partida;
 import SpringROA.SpringROA.model.TipusRecurs;
 import SpringROA.SpringROA.model.TipusTerreny;
 import SpringROA.SpringROA.model.Vertex;
+import SpringROA.SpringROA.repository.ArestaRepository;
 import SpringROA.SpringROA.repository.PartidaRepository;
 import jakarta.persistence.EntityManager;
 
@@ -35,6 +36,8 @@ public class PartidaService{
 	private PartidaRepository partidaRepository;
 	@Autowired
 	private EntityManager entityManager;
+	@Autowired
+	private ArestaRepository arestaRepository;
 	private static final int PUNTS_PER_DEFECTE = 10;
 	private final Random random = new Random();
 
@@ -93,12 +96,6 @@ public class PartidaService{
 		});
 	}
 
-	private static void afegir(List<TipusTerreny> llista, TipusTerreny terreny, int quantitat) {
-		for (int i = 0; i < quantitat; i++) {
-			llista.add(terreny);
-		}
-	}
-
 	/** Mostra hexàgons, número, lladre i construccions de cada vèrtex */
 	@Transactional
 	public void mostrarTauler(int idPartida) {
@@ -128,29 +125,6 @@ public class PartidaService{
 					}
 					System.out.printf("   vèrtex %d (posició %d): %s%n", v.getId(), hv.getPosicio(), info);
 				}
-			}
-			return null;
-		});
-	}
-
-	/** Mostra estat, ronda, actiu, última tirada i la situació de cada jugador */
-	@Transactional
-	public void mostrarPartida(int idPartida) {
-		executar(s -> {
-			Partida p = Consultes.carregarPartida(s, idPartida);
-			System.out.println("=== PARTIDA " + idPartida + " ===");
-			System.out.println("Estat: " + p.getEstat() + " | Ronda: " + p.getRonda()
-					+ " | Jugador actiu: " + (p.getActiu() == null ? "-" : p.getActiu().getNom())
-					+ " | Última tirada: " + p.getUltimaTirada()
-					+ " | Punts per guanyar: " + p.getPuntsPerGuanyar());
-			if (p.getGuanyador() != null) {
-				System.out.println("Guanyador: " + p.getGuanyador().getNom());
-			}
-			for (Jugador j : Consultes.jugadorsOrdenats(s, p)) {
-				System.out.printf("%s (%s) | punts: %d | poblats: %d | ciutats: %d | carreteres: %d | recursos: %d%n",
-						j.getNom(), j.getColor(), Consultes.calcularPunts(s, j),
-						Consultes.comptar(s, "Poblat", j), Consultes.comptar(s, "Ciutat", j),
-						Consultes.comptar(s, "Carretera", j), j.getTotalRecursos());
 			}
 			return null;
 		});
@@ -221,40 +195,5 @@ public class PartidaService{
 			}
 			return sb.toString().trim();
 		});
-	}
-
-	/** Comprova si algun jugador ha arribat als punts per guanyar */
-	@Transactional
-	public void comprovarVictoria(int idPartida) {
-		Partida partida = retornarPartidaById(idPartida);
-		Consultes.comprovarVictoria(entityManager, partida);
-	}
-
-	/** Ids de les arestes que toquen un vèrtex */
-	@Transactional
-	public List<Integer> arestesAdjacents(int idVertex) {
-		return executar(s -> s.createQuery(
-				"SELECT ar.id FROM Aresta ar WHERE ar.vertexA.id = :v OR ar.vertexB.id = :v", Integer.class)
-				.setParameter("v", idVertex).getResultList());
-	}
-
-	/** Id del jugador actiu, o null si encara no n'hi ha */
-	@Transactional(readOnly = true)
-	public Integer idJugadorActiu(int idPartida) {
-		Jugador j = retornarPartidaById(idPartida).getActiu();
-		if(j!=null) {
-			return j.getId();
-		}
-		else
-			return null;
-	}
-
-	@Transactional(readOnly = true)
-	public EstatPartida estat(int idPartida) {
-		return retornarPartidaById(idPartida).getEstat();
-	}
-	
-	private Partida retornarPartidaById(int idPartida) {
-		return partidaRepository.findById(idPartida).orElseThrow(()->new JocException("No existeix la partida " + idPartida));
 	}
 }
