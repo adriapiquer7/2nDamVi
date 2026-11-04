@@ -1,5 +1,4 @@
 export class Videojoc{
-
     private _titol : string;
     private _genere : string;
     private _plataforma :string;
@@ -40,6 +39,6 @@ export class Videojoc{
         this._preu = value;
     }
     toString(){
-        console.log("Titol: " + this._titol + ", Genere: " + this._genere + ", Plataforma: " + this._plataforma + ", Preu: " + this._preu+"€");
+        return ("Titol: " + this._titol + ", Genere: " + this._genere + ", Plataforma: " + this._plataforma + ", Preu: " + this._preu+"€");
     }
 }

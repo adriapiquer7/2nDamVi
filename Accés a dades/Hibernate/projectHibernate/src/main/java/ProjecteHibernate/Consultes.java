@@ -1,17 +1,10 @@
-package SpringROA.SpringROA.service;
+package ProjecteHibernate;
 
 import java.util.List;
 
 import org.hibernate.Session;
-import org.springframework.stereotype.Service;
-
-import SpringROA.SpringROA.exception.JocException;
-import SpringROA.SpringROA.model.EstatPartida;
-import SpringROA.SpringROA.model.Jugador;
-import SpringROA.SpringROA.model.Partida;
 
 /** Consultes JPQL i regles de puntuació compartides pels DAO. */
-@Service
 final class Consultes {
 
 	private Consultes() {

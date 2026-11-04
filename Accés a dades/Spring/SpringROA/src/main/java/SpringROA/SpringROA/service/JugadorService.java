@@ -1,14 +1,16 @@
 package SpringROA.SpringROA.service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
-import org.hibernate.Session;
-import org.hibernate.query.Query;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import SpringROA.SpringROA.GenericDao;
+import SpringROA.SpringROA.dto.JugadorRecursosResposta;
 import SpringROA.SpringROA.exception.JocException;
 import SpringROA.SpringROA.model.Aresta;
 import SpringROA.SpringROA.model.Assentament;
@@ -19,12 +21,20 @@ import SpringROA.SpringROA.model.Hexagon;
 import SpringROA.SpringROA.model.Jugador;
 import SpringROA.SpringROA.model.Partida;
 import SpringROA.SpringROA.model.Poblat;
-import SpringROA.SpringROA.model.RecursJugador;
 import SpringROA.SpringROA.model.TipusRecurs;
 import SpringROA.SpringROA.model.Vertex;
+import SpringROA.SpringROA.repository.ArestaRepository;
+import SpringROA.SpringROA.repository.AssentamentRepository;
+import SpringROA.SpringROA.repository.CarreteraRepository;
+import SpringROA.SpringROA.repository.CiutatRepository;
+import SpringROA.SpringROA.repository.HexagonVertexRepository;
+import SpringROA.SpringROA.repository.JugadorRepository;
+import SpringROA.SpringROA.repository.PoblatRepository;
+import SpringROA.SpringROA.repository.VertexRepository;
 
+/** Servei fort del jugador: recursos, construir i passar torn (abans, JugadorDAO) */
 @Service
-public class JugadorService extends GenericDao<Jugador, Integer> {
+public class JugadorService {
 
 	static final int LIMIT_CARRETERES = 15;
 	static final int LIMIT_POBLATS = 5;
@@ -35,8 +45,236 @@ public class JugadorService extends GenericDao<Jugador, Integer> {
 			TipusRecurs.LLANA, 1, TipusRecurs.BLAT, 1);
 	static final Map<TipusRecurs, Integer> COST_CIUTAT = Map.of(TipusRecurs.BLAT, 2, TipusRecurs.MINERAL, 3);
 
+	@Autowired
+	private JugadorRepository jugadorRepository;
+	@Autowired
+	private VertexRepository vertexRepository;
+	@Autowired
+	private ArestaRepository arestaRepository;
+	@Autowired
+	private AssentamentRepository assentamentRepository;
+	@Autowired
+	private PoblatRepository poblatRepository;
+	@Autowired
+	private CiutatRepository ciutatRepository;
+	@Autowired
+	private CarreteraRepository carreteraRepository;
+	@Autowired
+	private HexagonVertexRepository hexagonVertexRepository;
+
+	// ------------------------------------------------------------------
+	// Endpoints (mètodes públics: aquí hi ha el @Transactional)
+	// ------------------------------------------------------------------
+
+	/** Jugador amb el seu inventari; 404 si no existeix */
+	@Transactional(readOnly = true)
+	public ResponseEntity<JugadorRecursosResposta> recursos(int idJugador) {
+		return ResponseEntity.ok(JugadorRecursosResposta.de(carregarJugador(idJugador)));
+	}
+
+	/** Construeix una carretera, un poblat o una ciutat segons el tipus. Retorna un text amb el que passa. */
+	@Transactional
+	public ResponseEntity<String> construir(int idJugador, String tipus, int posicio) {
+		Jugador j = carregarJugador(idJugador);
+		String resultat = switch (tipus.trim().toUpperCase()) {
+			case "CARRETERA" -> construirCarretera(j, posicio);
+			case "POBLAT" -> construirPoblat(j, posicio);
+			case "CIUTAT" -> millorarACiutat(j, posicio);
+			default -> throw new JocException(
+					"Tipus de construcció no vàlid: " + tipus + " (ha de ser CARRETERA, POBLAT o CIUTAT)",
+					HttpStatus.BAD_REQUEST);
+		};
+		return ResponseEntity.status(HttpStatus.CREATED).body(resultat);
+	}
+
+	/** Passa el torn del jugador actiu al següent (seguint l'ordre de serp a la preparació) */
+	@Transactional
+	public ResponseEntity<String> passar(int idJugador) {
+		Jugador j = carregarJugador(idJugador);
+		Partida p = j.getPartida();
+		if (p.getEstat() == EstatPartida.FINALITZADA) {
+			throw new JocException("La partida ja ha finalitzat");
+		}
+		if (p.getActiu() == null || !p.getActiu().getId().equals(j.getId())) {
+			throw new JocException("No és el torn de " + j.getNom());
+		}
+		int numJugadors = jugadorRepository.findByPartidaOrderByOrdreTorn(p).size();
+		int ordre = j.getOrdreTorn();
+
+		if (p.getEstat() == EstatPartida.PREPARACIO) {
+			int ronda = p.getRonda();
+			if (poblatRepository.countByPropietari(j) < ronda || carreteraRepository.countByPropietari(j) < ronda) {
+				throw new JocException("Has de col·locar un poblat i una carretera en aquest torn");
+			}
+			Jugador seguent;
+			if (ronda == 1) {
+				if (ordre < numJugadors) {
+					seguent = jugadorPerOrdre(p, ordre + 1);
+				} else {
+					// L'últim de la primera ronda juga també el primer de la segona
+					p.setRonda(2);
+					seguent = j;
+				}
+			} else {
+				if (ordre > 1) {
+					seguent = jugadorPerOrdre(p, ordre - 1);
+				} else {
+					// Acaba la preparació: comença la partida
+					p.setEstat(EstatPartida.EN_CURS);
+					p.setRonda(1);
+					seguent = jugadorPerOrdre(p, 1);
+				}
+			}
+			p.setActiu(seguent);
+			return ResponseEntity.ok("Torn passat. Ara juga " + seguent.getNom());
+		}
+
+		// EN_CURS
+		if (!p.isDausTirats()) {
+			throw new JocException("Has de tirar els daus abans de passar torn");
+		}
+		if (p.isLladrePendent()) {
+			throw new JocException("Cal moure el lladre abans de passar torn");
+		}
+		Jugador seguent;
+		if (ordre < numJugadors) {
+			seguent = jugadorPerOrdre(p, ordre + 1);
+		} else {
+			seguent = jugadorPerOrdre(p, 1);
+			p.setRonda(p.getRonda() + 1);
+		}
+		p.setActiu(seguent);
+		p.setDausTirats(false);
+		return ResponseEntity.ok("Torn passat. Ara juga " + seguent.getNom() + " (ronda " + p.getRonda() + ")");
+	}
+
+	// ------------------------------------------------------------------
+	// Operacions de construcció (privades: formen part de la transacció del públic)
+	// Sempre es comprova TOT abans de modificar res.
+	// ------------------------------------------------------------------
+
+	/** Construeix una carretera. A preparació no es paga ni es comprova la connexió normal. */
+	private String construirCarretera(Jugador j, int idAresta) {
+		Partida p = validarTorn(j);
+
+		Aresta a = arestaRepository.findById(idAresta)
+				.orElseThrow(() -> new JocException("L'aresta " + idAresta + " no existeix", HttpStatus.NOT_FOUND));
+		if (!a.getPartida().getId().equals(p.getId())) {
+			throw new JocException("L'aresta " + idAresta + " pertany a una altra partida");
+		}
+		if (carreteraRepository.countByAresta(a) > 0) {
+			throw new JocException("L'aresta " + idAresta + " ja està ocupada");
+		}
+		long carreteres = carreteraRepository.countByPropietari(j);
+		if (carreteres >= LIMIT_CARRETERES) {
+			throw new JocException("Límit de " + LIMIT_CARRETERES + " carreteres assolit");
+		}
+
+		if (p.getEstat() == EstatPartida.PREPARACIO) {
+			if (carreteres >= p.getRonda()) {
+				throw new JocException("Ja has col·locat la carretera d'aquesta ronda");
+			}
+			if (!tocaPoblatSenseCarreteraPreparacio(j, a)) {
+				throw new JocException("En preparació la carretera ha de tocar el teu poblat nou");
+			}
+		} else {
+			if (!connectadaAmbPropi(j, a)) {
+				throw new JocException("La carretera no està connectada amb cap construcció o carretera teva");
+			}
+			pagar(j, COST_CARRETERA);
+		}
+
+		carreteraRepository.save(new Carretera(j, a));
+		return "Carretera construïda a l'aresta " + idAresta;
+	}
+
+	/** Construeix un poblat. Durant la preparació no es paga ni cal connexió. */
+	private String construirPoblat(Jugador j, int idVertex) {
+		Partida p = validarTorn(j);
+
+		Vertex v = carregarVertex(idVertex, p);
+		if (assentamentRepository.existsByVertex(v)) {
+			throw new JocException("El vèrtex " + idVertex + " ja està ocupat");
+		}
+		if (assentamentRepository.assentamentsAdjacents(v) > 0) {
+			throw new JocException("Regla de la distància: hi ha un poblat o ciutat en un vèrtex adjacent");
+		}
+
+		boolean preparacio = p.getEstat() == EstatPartida.PREPARACIO;
+		long poblats = poblatRepository.countByPropietari(j);
+		if (preparacio) {
+			if (poblats >= p.getRonda()) {
+				throw new JocException("Ja has col·locat el poblat d'aquesta ronda");
+			}
+		} else if (carreteraRepository.carreteresPropiesAmb(j, v) == 0) {
+			throw new JocException("El vèrtex no està connectat amb cap carretera teva");
+		}
+		if (poblats >= LIMIT_POBLATS) {
+			throw new JocException("Límit de " + LIMIT_POBLATS + " poblats assolit");
+		}
+		if (!preparacio) {
+			pagar(j, COST_POBLAT);
+		}
+
+		poblatRepository.save(new Poblat(j, v));
+		// Segon poblat de la preparació: 1 recurs per cada hexàgon que el toca
+		if (preparacio && poblats + 1 == 2) {
+			repartirRecursInicials(j, v);
+		}
+		comprovarVictoria(p);
+		return "Poblat construït al vèrtex " + idVertex;
+	}
+
+	/** Substitueix un poblat propi per una ciutat */
+	private String millorarACiutat(Jugador j, int idVertex) {
+		Partida p = validarTorn(j);
+		if (p.getEstat() != EstatPartida.EN_CURS) {
+			throw new JocException("Només es pot millorar durant la partida (EN_CURS)");
+		}
+
+		Vertex v = carregarVertex(idVertex, p);
+		Optional<Assentament> assentament = assentamentRepository.findByVertex(v);
+		if (assentament.isEmpty() || !(assentament.get() instanceof Poblat poblat)
+				|| !poblat.getPropietari().getId().equals(j.getId())) {
+			throw new JocException("No tens cap poblat teu al vèrtex " + idVertex + " per millorar");
+		}
+		if (ciutatRepository.countByPropietari(j) >= LIMIT_CIUTATS) {
+			throw new JocException("Límit de " + LIMIT_CIUTATS + " ciutats assolit");
+		}
+
+		pagar(j, COST_CIUTAT);
+		poblatRepository.delete(poblat);
+		poblatRepository.flush(); // el vèrtex té un únic assentament: cal esborrar abans d'inserir
+		ciutatRepository.save(new Ciutat(j, v));
+		comprovarVictoria(p);
+		return "Poblat millorat a ciutat al vèrtex " + idVertex;
+	}
+
+	// ------------------------------------------------------------------
+	// Ajudes
+	// ------------------------------------------------------------------
+
+	private Jugador carregarJugador(int idJugador) {
+		return jugadorRepository.findById(idJugador)
+				.orElseThrow(() -> new JocException("No existeix el jugador " + idJugador, HttpStatus.NOT_FOUND));
+	}
+
+	private Vertex carregarVertex(int idVertex, Partida p) {
+		Vertex v = vertexRepository.findById(idVertex)
+				.orElseThrow(() -> new JocException("El vèrtex " + idVertex + " no existeix", HttpStatus.NOT_FOUND));
+		if (!v.getPartida().getId().equals(p.getId())) {
+			throw new JocException("El vèrtex " + idVertex + " pertany a una altra partida");
+		}
+		return v;
+	}
+
+	private Jugador jugadorPerOrdre(Partida p, int ordre) {
+		return jugadorRepository.findByPartidaAndOrdreTorn(p, ordre).orElseThrow(
+				() -> new JocException("No existeix el jugador amb ordre " + ordre, HttpStatus.INTERNAL_SERVER_ERROR));
+	}
+
 	/** Comprova que la partida és activa i que és el torn del jugador. Retorna la partida. */
-	private static Partida validarTorn(Jugador j) {
+	private Partida validarTorn(Jugador j) {
 		Partida p = j.getPartida();
 		if (p.getEstat() == EstatPartida.FINALITZADA) {
 			throw new JocException("La partida ja ha finalitzat");
@@ -56,7 +294,7 @@ public class JugadorService extends GenericDao<Jugador, Integer> {
 	}
 
 	/** Descompta els recursos del cost, o llança error si no n'hi ha prou */
-	private static void pagar(Jugador j, Map<TipusRecurs, Integer> cost) {
+	private void pagar(Jugador j, Map<TipusRecurs, Integer> cost) {
 		for (Map.Entry<TipusRecurs, Integer> e : cost.entrySet()) {
 			if (j.getQuantitat(e.getKey()) < e.getValue()) {
 				throw new JocException("Recursos insuficients: falten " + e.getKey());
@@ -67,41 +305,11 @@ public class JugadorService extends GenericDao<Jugador, Integer> {
 		}
 	}
 
-	private static boolean existeixAssentament(Session s, Vertex v) {
-		return s.createQuery("SELECT COUNT(x) FROM Assentament x WHERE x.vertex = :v", Long.class)
-				.setParameter("v", v).getSingleResult() > 0;
-	}
-
-	/** Regla de la distància: cap vèrtex adjacent pot tenir un assentament */
-	private static boolean hiHaAssentamentAdjacent(Session s, Vertex v) {
-		return s.createQuery("SELECT COUNT(x) FROM Assentament x WHERE "
-				+ "x.vertex IN (SELECT ar.vertexB FROM Aresta ar WHERE ar.vertexA = :v) OR "
-				+ "x.vertex IN (SELECT ar.vertexA FROM Aresta ar WHERE ar.vertexB = :v)", Long.class)
-				.setParameter("v", v).getSingleResult() > 0;
-	}
-
-	private static long comptarCarreteresAresta(Session s, Aresta a) {
-		return s.createQuery("SELECT COUNT(c) FROM Carretera c WHERE c.aresta = :a", Long.class)
-				.setParameter("a", a).getSingleResult();
-	}
-
-	/** Nombre de construccions del jugador a un vèrtex (assentaments) */
-	private static long assentamentsPropis(Session s, Jugador j, Vertex v) {
-		return s.createQuery("SELECT COUNT(x) FROM Assentament x WHERE x.propietari = :j AND x.vertex = :v", Long.class)
-				.setParameter("j", j).setParameter("v", v).getSingleResult();
-	}
-
-	/** Nombre de carreteres del jugador que toquen un vèrtex */
-	private static long carreteresPropiesAmb(Session s, Jugador j, Vertex v) {
-		return s.createQuery("SELECT COUNT(c) FROM Carretera c WHERE c.propietari = :j "
-				+ "AND (c.aresta.vertexA = :v OR c.aresta.vertexB = :v)", Long.class)
-				.setParameter("j", j).setParameter("v", v).getSingleResult();
-	}
-
 	/** Connexió normal: una aresta toca un assentament o una carretera del mateix jugador */
-	private static boolean connectadaAmbPropi(Session s, Jugador j, Aresta a) {
+	private boolean connectadaAmbPropi(Jugador j, Aresta a) {
 		for (Vertex v : List.of(a.getVertexA(), a.getVertexB())) {
-			if (assentamentsPropis(s, j, v) > 0 || carreteresPropiesAmb(s, j, v) > 0) {
+			if (assentamentRepository.countByPropietariAndVertex(j, v) > 0
+					|| carreteraRepository.carreteresPropiesAmb(j, v) > 0) {
 				return true;
 			}
 		}
@@ -109,26 +317,15 @@ public class JugadorService extends GenericDao<Jugador, Integer> {
 	}
 
 	/** En preparació: la carretera ha de tocar un poblat propi que encara no tingui cap carretera */
-	private static boolean tocaPoblatSenseCarreteraPreparacio(Session s, Jugador j, Aresta a) {
-		List<Vertex> lliures = s.createQuery("SELECT x.vertex FROM Assentament x WHERE x.propietari = :j "
-				+ "AND NOT EXISTS (SELECT c FROM Carretera c WHERE c.propietari = :j "
-				+ "AND (c.aresta.vertexA = x.vertex OR c.aresta.vertexB = x.vertex))", Vertex.class)
-				.setParameter("j", j).getResultList();
+	private boolean tocaPoblatSenseCarreteraPreparacio(Jugador j, Aresta a) {
+		List<Vertex> lliures = assentamentRepository.vertexsSenseCarretera(j);
 		return lliures.stream().anyMatch(v -> v.getId().equals(a.getVertexA().getId())
 				|| v.getId().equals(a.getVertexB().getId()));
 	}
 
-	private static boolean connectadaAmbCarreteraPropia(Session s, Jugador j, Vertex v) {
-		return s.createQuery("SELECT COUNT(c) FROM Carretera c WHERE c.propietari = :j "
-				+ "AND (c.aresta.vertexA = :v OR c.aresta.vertexB = :v)", Long.class)
-				.setParameter("j", j).setParameter("v", v).getSingleResult() > 0;
-	}
-
 	/** Quan el jugador col·loca el seu segon poblat de la preparació, rep 1 recurs per hexàgon adjacent */
-	private static void repartirRecursInicials(Session s, Jugador j, Vertex v) {
-		List<Hexagon> hexagons = s.createQuery("SELECT hv.hexagon FROM HexagonVertex hv WHERE hv.vertex = :v",
-				Hexagon.class).setParameter("v", v).getResultList();
-		for (Hexagon h : hexagons) {
+	private void repartirRecursInicials(Jugador j, Vertex v) {
+		for (Hexagon h : hexagonVertexRepository.hexagonsDelVertex(v)) {
 			TipusRecurs recurs = h.getTerreny().getRecurs();
 			if (recurs != null) {
 				j.afegirRecurs(recurs, 1);
@@ -136,257 +333,22 @@ public class JugadorService extends GenericDao<Jugador, Integer> {
 		}
 	}
 
-	/** Construeix una carretera. A preparació no es paga ni es comprova la connexió normal. */
-	public String construirCarretera(int idJugador, int idAresta) {
-		return executar(s -> {
-			Jugador j = Consultes.carregarJugador(s, idJugador);
-			Partida p = validarTorn(j);
-
-			Aresta a = s.get(Aresta.class, idAresta);
-			if (a == null || !a.getPartida().getId().equals(p.getId())) {
-				throw new JocException("L'aresta " + idAresta + " no pertany a aquesta partida");
-			}
-			if (comptarCarreteresAresta(s, a) > 0) {
-				throw new JocException("L'aresta " + idAresta + " ja està ocupada");
-			}
-			if (Consultes.comptar(s, "Carretera", j) >= LIMIT_CARRETERES) {
-				throw new JocException("Límit de " + LIMIT_CARRETERES + " carreteres assolit");
-			}
-
-			if (p.getEstat() == EstatPartida.PREPARACIO) {
-				if (Consultes.comptar(s, "Carretera", j) >= p.getRonda()) {
-					throw new JocException("Ja has col·locat la carretera d'aquesta ronda");
-				}
-				if (!tocaPoblatSenseCarreteraPreparacio(s, j, a)) {
-					throw new JocException("En preparació la carretera ha de tocar el teu poblat nou");
-				}
-			} else {
-				if (!connectadaAmbPropi(s, j, a)) {
-					throw new JocException("La carretera no connecta amb cap construcció o carretera teva");
-				}
-				pagar(j, COST_CARRETERA);
-			}
-
-			s.persist(new Carretera(j, a));
-			return "Carretera construïda a l'aresta " + idAresta;
-		});
+	/** Punts de victòria: 1 per poblat, 2 per ciutat */
+	private int calcularPunts(Jugador j) {
+		return (int) (poblatRepository.countByPropietari(j) + 2 * ciutatRepository.countByPropietari(j));
 	}
 
-	/** Construeix un poblat. Durant la preparació no es paga ni cal connexió. */
-	public String construirPoblat(int idJugador, int idVertex) {
-		return executar(s -> {
-			Jugador j = Consultes.carregarJugador(s, idJugador);
-			Partida p = validarTorn(j);
-
-			Vertex v = s.get(Vertex.class, idVertex);
-			if (v == null || !v.getPartida().getId().equals(p.getId())) {
-				throw new JocException("El vèrtex " + idVertex + " no pertany a aquesta partida");
+	/** Si algun jugador arriba als punts per guanyar, la partida acaba */
+	private void comprovarVictoria(Partida p) {
+		if (p.getEstat() != EstatPartida.EN_CURS) {
+			return;
+		}
+		for (Jugador j : jugadorRepository.findByPartidaOrderByOrdreTorn(p)) {
+			if (calcularPunts(j) >= p.getPuntsPerGuanyar()) {
+				p.setEstat(EstatPartida.FINALITZADA);
+				p.setGuanyador(j);
+				return;
 			}
-			if (existeixAssentament(s, v)) {
-				throw new JocException("El vèrtex " + idVertex + " ja està ocupat");
-			}
-			if (hiHaAssentamentAdjacent(s, v)) {
-				throw new JocException("Regla de la distància: hi ha un poblat o ciutat en un vèrtex adjacent");
-			}
-
-			boolean preparacio = p.getEstat() == EstatPartida.PREPARACIO;
-			if (preparacio) {
-				if (Consultes.comptar(s, "Poblat", j) >= p.getRonda()) {
-					throw new JocException("Ja has col·locat el poblat d'aquesta ronda");
-				}
-			} else if (!connectadaAmbCarreteraPropia(s, j, v)) {
-				throw new JocException("El vèrtex no està connectat amb cap carretera teva");
-			}
-			if (Consultes.comptar(s, "Poblat", j) >= LIMIT_POBLATS) {
-				throw new JocException("Límit de " + LIMIT_POBLATS + " poblats assolit");
-			}
-			if (!preparacio) {
-				pagar(j, COST_POBLAT);
-			}
-
-			s.persist(new Poblat(j, v));
-			if (preparacio && Consultes.comptar(s, "Poblat", j) == 2) {
-				repartirRecursInicials(s, j, v);
-			}
-			Consultes.comprovarVictoria(s, p);
-			return "Poblat construït al vèrtex " + idVertex;
-		});
-	}
-
-	/** Substitueix un poblat propi per una ciutat */
-	public String millorarACiutat(int idJugador, int idVertex) {
-		return executar(s -> {
-			Jugador j = Consultes.carregarJugador(s, idJugador);
-			Partida p = validarTorn(j);
-			if (p.getEstat() != EstatPartida.EN_CURS) {
-				throw new JocException("Només es pot millorar durant la partida (EN_CURS)");
-			}
-
-			Vertex v = s.get(Vertex.class, idVertex);
-			if (v == null || !v.getPartida().getId().equals(p.getId())) {
-				throw new JocException("El vèrtex " + idVertex + " no pertany a aquesta partida");
-			}
-			List<Assentament> ass = s.createQuery("FROM Assentament x WHERE x.vertex = :v", Assentament.class)
-					.setParameter("v", v).getResultList();
-			if (ass.isEmpty() || !(ass.get(0) instanceof Poblat)
-					|| !ass.get(0).getPropietari().getId().equals(j.getId())) {
-				throw new JocException("No tens cap poblat teu al vèrtex " + idVertex);
-			}
-			if (Consultes.comptar(s, "Ciutat", j) >= LIMIT_CIUTATS) {
-				throw new JocException("Límit de " + LIMIT_CIUTATS + " ciutats assolit");
-			}
-
-			pagar(j, COST_CIUTAT);
-			s.remove(ass.get(0));
-			s.flush(); // el vèrtex té un únic assentament: cal esborrar abans d'inserir
-			s.persist(new Ciutat(j, v));
-			Consultes.comprovarVictoria(s, p);
-			return "Poblat millorat a ciutat al vèrtex " + idVertex;
-		});
-	}
-
-	/** Canvia 4 recursos del tipus dona per 1 del tipus rep */
-	public String comerciarBanca(int idJugador, TipusRecurs dona, TipusRecurs rep) {
-		return executar(s -> {
-			Jugador j = Consultes.carregarJugador(s, idJugador);
-			Partida p = validarTorn(j);
-			if (p.getEstat() != EstatPartida.EN_CURS) {
-				throw new JocException("El comerç només és possible durant la partida (EN_CURS)");
-			}
-			if (dona == null || rep == null || dona == rep) {
-				throw new JocException("Els recursos de comerç han de ser diferents");
-			}
-			if (j.getQuantitat(dona) < 4) {
-				throw new JocException("Necessites 4 recursos de tipus " + dona + " per comerciar");
-			}
-			j.afegirRecurs(dona, -4);
-			j.afegirRecurs(rep, 1);
-			return "Has canviat 4 " + dona + " per 1 " + rep;
-		});
-	}
-
-	public int calcularPunts(int idJugador) {
-		return executar(s -> Consultes.calcularPunts(s, Consultes.carregarJugador(s, idJugador)));
-	}
-
-	/** Passa el torn del jugador actiu al següent (seguint l'ordre de serp a la preparació) */
-	public String passarTorn(int idJugador) {
-		return executar(s -> {
-			Jugador j = Consultes.carregarJugador(s, idJugador);
-			Partida p = j.getPartida();
-			if (p.getEstat() == EstatPartida.FINALITZADA) {
-				throw new JocException("La partida ja ha finalitzat");
-			}
-			if (p.getActiu() == null || !p.getActiu().getId().equals(j.getId())) {
-				throw new JocException("No és el torn de " + j.getNom());
-			}
-			int numJugadors = Consultes.jugadorsOrdenats(s, p).size();
-			int ordre = j.getOrdreTorn();
-
-			if (p.getEstat() == EstatPartida.PREPARACIO) {
-				int ronda = p.getRonda();
-				if (Consultes.comptar(s, "Poblat", j) < ronda || Consultes.comptar(s, "Carretera", j) < ronda) {
-					throw new JocException("Has de col·locar un poblat i una carretera en aquest torn");
-				}
-				Jugador seguent;
-				if (ronda == 1) {
-					if (ordre < numJugadors) {
-						seguent = jugadorPerOrdre(s, p, ordre + 1);
-					} else {
-						// L'últim de la primera ronda juga també el primer de la segona
-						p.setRonda(2);
-						seguent = j;
-					}
-				} else {
-					if (ordre > 1) {
-						seguent = jugadorPerOrdre(s, p, ordre - 1);
-					} else {
-						// Acaba la preparació: comença la partida
-						p.setEstat(EstatPartida.EN_CURS);
-						p.setRonda(1);
-						seguent = jugadorPerOrdre(s, p, 1);
-					}
-				}
-				p.setActiu(seguent);
-				return "Torn passat. Ara juga " + seguent.getNom();
-			}
-
-			// EN_CURS
-			if (!p.isDausTirats()) {
-				throw new JocException("Has de tirar els daus abans de passar torn");
-			}
-			if (p.isLladrePendent()) {
-				throw new JocException("Cal moure el lladre abans de passar torn");
-			}
-			Jugador seguent;
-			if (ordre < numJugadors) {
-				seguent = jugadorPerOrdre(s, p, ordre + 1);
-			} else {
-				seguent = jugadorPerOrdre(s, p, 1);
-				p.setRonda(p.getRonda() + 1);
-			}
-			p.setActiu(seguent);
-			p.setDausTirats(false);
-			return "Torn passat. Ara juga " + seguent.getNom() + " (ronda " + p.getRonda() + ")";
-		});
-	}
-
-	private static Jugador jugadorPerOrdre(Session s, Partida p, int ordre) {
-		return s.createQuery("FROM Jugador j WHERE j.partida = :p AND j.ordreTorn = :o", Jugador.class)
-				.setParameter("p", p).setParameter("o", ordre).getSingleResult();
-	}
-
-	/**
-	 * Vèrtexs on el jugador pot construir un poblat ara mateix: lliures, que compleixin
-	 * la regla de la distància i (fora de preparació) connectats a una carretera pròpia.
-	 * Tot es resol amb una única consulta JPQL.
-	 */
-	public List<Vertex> vertexsDisponibles(int idJugador) {
-		return executar(s -> {
-			Jugador j = Consultes.carregarJugador(s, idJugador);
-			Partida p = j.getPartida();
-			if (p.getEstat() == EstatPartida.FINALITZADA) {
-				return new ArrayList<Vertex>();
-			}
-			boolean preparacio = p.getEstat() == EstatPartida.PREPARACIO;
-			if (!preparacio && Consultes.comptar(s, "Poblat", j) >= LIMIT_POBLATS) {
-				return new ArrayList<Vertex>();
-			}
-
-			String hql = "SELECT v FROM Vertex v WHERE v.partida = :p "
-					+ "AND NOT EXISTS (SELECT x FROM Assentament x WHERE x.vertex = v) "
-					+ "AND NOT EXISTS (SELECT ar FROM Aresta ar WHERE "
-					+ "(ar.vertexA = v AND EXISTS (SELECT y FROM Assentament y WHERE y.vertex = ar.vertexB)) OR "
-					+ "(ar.vertexB = v AND EXISTS (SELECT z FROM Assentament z WHERE z.vertex = ar.vertexA)))";
-			if (!preparacio) {
-				hql += " AND EXISTS (SELECT c FROM Carretera c WHERE c.propietari = :j "
-						+ "AND (c.aresta.vertexA = v OR c.aresta.vertexB = v))";
-			}
-			hql += " ORDER BY v.codi";
-
-			Query<Vertex> consulta = s.createQuery(hql, Vertex.class);
-			consulta.setParameter("p", p);
-			if (!preparacio) {
-				consulta.setParameter("j", j);
-			}
-			List<Vertex> resultat = consulta.getResultList();
-			return resultat;
-		});
-	}
-
-	/** Mostra l'inventari de recursos del jugador */
-	public void mostrarRecursos(int idJugador) {
-		executar(s -> {
-			Jugador j = Consultes.carregarJugador(s, idJugador);
-			System.out.println("Recursos de " + j.getNom() + ":");
-			List<RecursJugador> recursos = s.createQuery(
-					"FROM RecursJugador r WHERE r.jugador = :j ORDER BY r.tipus", RecursJugador.class)
-					.setParameter("j", j).getResultList();
-			for (RecursJugador r : recursos) {
-				System.out.printf("  %-8s %d%n", r.getTipus(), r.getQuantitat());
-			}
-			System.out.println("  Total: " + j.getTotalRecursos());
-			return null;
-		});
+		}
 	}
 }

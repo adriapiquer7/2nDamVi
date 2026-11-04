@@ -9,16 +9,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.Session;
-import org.springframework.stereotype.Service;
+import jakarta.persistence.EntityManager;
 
 import SpringROA.SpringROA.exception.JocException;
-import SpringROA.SpringROA.model.Aresta;
-import SpringROA.SpringROA.model.Hexagon;
-import SpringROA.SpringROA.model.HexagonVertex;
-import SpringROA.SpringROA.model.Partida;
-import SpringROA.SpringROA.model.TipusTerreny;
-import SpringROA.SpringROA.model.Vertex;
+import SpringROA.SpringROA.model.*;
 
 /**
  * Carrega la topologia del tauler des dels CSV de la carpeta "csv" (a l'arrel del projecte).
@@ -30,7 +24,6 @@ import SpringROA.SpringROA.model.Vertex;
  *   arestes.csv        id;vertexA;vertexB       (ids del CSV)
  * Cal revisar-ho contra els fitxers reals.
  */
-@Service
 final class TopologiaCSV {
 
 	static final String DIRECTORI = "csv";
@@ -38,7 +31,7 @@ final class TopologiaCSV {
 	private TopologiaCSV() {
 	}
 
-	static List<Hexagon> carregar(Session s, Partida p, List<TipusTerreny> terrenys, List<Integer> numeros) {
+	static List<Hexagon> carregar(EntityManager em, Partida p, List<TipusTerreny> terrenys, List<Integer> numeros) {
 		List<String[]> filesHex = llegir("hexagons.csv");
 		if (filesHex.size() != terrenys.size()) {
 			throw new JocException("S'esperaven " + terrenys.size() + " hexàgons i n'hi ha " + filesHex.size());
@@ -55,27 +48,27 @@ final class TopologiaCSV {
 			// El desert no té número
 			Integer numero = terreny == TipusTerreny.DESERT ? null : numeros.get(indexNumero++);
 			Hexagon h = new Hexagon(p, parse(c[0]), terreny, numero, parse(c[1]), parse(c[2]));
-			s.persist(h);
+			em.persist(h);
 			hexagonsPerCodi.put(h.getCodi(), h);
 			hexagons.add(h);
 		}
 
 		for (String[] c : llegir("vertexs.csv")) {
 			Vertex v = new Vertex(p, parse(c[0]));
-			s.persist(v);
+			em.persist(v);
 			vertexsPerCodi.put(v.getCodi(), v);
 		}
 
 		for (String[] c : llegir("hexagon_vertex.csv")) {
 			Hexagon h = buscar(hexagonsPerCodi, parse(c[0]), "hexàgon");
 			Vertex v = buscar(vertexsPerCodi, parse(c[1]), "vèrtex");
-			s.persist(new HexagonVertex(h, v, parse(c[2])));
+			em.persist(new HexagonVertex(h, v, parse(c[2])));
 		}
 
 		for (String[] c : llegir("arestes.csv")) {
 			Vertex a = buscar(vertexsPerCodi, parse(c[1]), "vèrtex");
 			Vertex b = buscar(vertexsPerCodi, parse(c[2]), "vèrtex");
-			s.persist(new Aresta(p, parse(c[0]), a, b));
+			em.persist(new Aresta(p, parse(c[0]), a, b));
 		}
 
 		return hexagons;
