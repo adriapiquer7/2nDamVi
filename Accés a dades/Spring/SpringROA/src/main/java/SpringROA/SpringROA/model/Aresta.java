@@ -21,7 +21,6 @@ public class Aresta {
 	@Column(name = "id")
 	private Integer id;
 
-	/** Id que té l'aresta al CSV */
 	@NotNull
 	@Column(name = "codi", nullable = false)
 	private Integer codi;

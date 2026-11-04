@@ -15,7 +15,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 
-/** Classe base de poblats, ciutats i carreteres. Herència SINGLE_TABLE (una sola taula). */
 @Entity
 @Table(name = "Construccio")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)

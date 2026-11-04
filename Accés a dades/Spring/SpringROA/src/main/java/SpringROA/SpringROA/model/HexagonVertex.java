@@ -14,7 +14,6 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
-/** Relació Hexagon-Vertex amb la posició (0-5) del vèrtex dins l'hexàgon. */
 @Entity
 @Table(name = "HexagonVertex", uniqueConstraints = @UniqueConstraint(columnNames = { "hexagon_id", "posicio" }))
 public class HexagonVertex {

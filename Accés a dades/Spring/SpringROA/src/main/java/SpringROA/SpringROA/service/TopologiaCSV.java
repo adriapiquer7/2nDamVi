@@ -30,7 +30,7 @@ import jakarta.persistence.EntityManager;
  *   arestes.csv        id;vertexA;vertexB       (ids del CSV)
  * Cal revisar-ho contra els fitxers reals.
  */
-final class TopologiaCSV {
+class TopologiaCSV {
 
 	static final String DIRECTORI = "csv";
 
@@ -51,7 +51,6 @@ final class TopologiaCSV {
 		int indexNumero = 0;
 		for (String[] c : filesHex) {
 			TipusTerreny terreny = terrenys.get(indexTerreny++);
-			// El desert no té número
 			Integer numero = terreny == TipusTerreny.DESERT ? null : numeros.get(indexNumero++);
 			Hexagon h = new Hexagon(p, parse(c[0]), terreny, numero, parse(c[1]), parse(c[2]));
 			em.persist(h);
@@ -88,7 +87,6 @@ final class TopologiaCSV {
 		return valor;
 	}
 
-	/** Llegeix un CSV i retorna les files (sense la capçalera) com a arrays de text */
 	private static List<String[]> llegir(String fitxer) {
 		Path path = Path.of(DIRECTORI, fitxer);
 		try {
