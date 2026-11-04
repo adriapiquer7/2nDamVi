@@ -61,15 +61,12 @@ public class Jugador {
 	@JoinColumn(name = "partida_id", nullable = false)
 	private Partida partida;
 
-	/** Inventari: 5 files RecursJugador, creades en crear el jugador */
 	@OneToMany(mappedBy = "jugador", cascade = CascadeType.ALL)
 	private List<RecursJugador> inventari = new ArrayList<>();
 
-	/** Poblats, ciutats i carreteres propietat del jugador */
 	@OneToMany(mappedBy = "propietari")
 	private List<Construccio> construccions = new ArrayList<>();
 
-	/** Cartes de desenvolupament a la mà (part avançada) */
 	@OneToMany(mappedBy = "jugador")
 	private List<CartaDesenvolupament> ma = new ArrayList<>();
 
@@ -94,7 +91,6 @@ public class Jugador {
 	public Integer getCavallersJugats() { return cavallersJugats; }
 	public Partida getPartida() { return partida; }
 
-	/** Retorna la fila de l'inventari per a un tipus de recurs */
 	public RecursJugador getRecurs(TipusRecurs tipus) {
 		for (RecursJugador r : inventari) {
 			if (r.getTipus() == tipus) {
@@ -108,7 +104,6 @@ public class Jugador {
 		return getRecurs(tipus).getQuantitat();
 	}
 
-	/** Suma (o resta si és negatiu) recursos del tipus indicat */
 	public void afegirRecurs(TipusRecurs tipus, int quantitat) {
 		RecursJugador r = getRecurs(tipus);
 		r.setQuantitat(r.getQuantitat() + quantitat);

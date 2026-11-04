@@ -63,7 +63,6 @@ public class Partida {
 	@Column(name = "puntsPerGuanyar", nullable = false)
 	private Integer puntsPerGuanyar;
 
-	// Relacions que no tenen valor quan es crea la partida: nullable
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "lladre_id")
 	private Hexagon lladre;
@@ -76,7 +75,6 @@ public class Partida {
 	@JoinColumn(name = "guanyador_id")
 	private Jugador guanyador;
 
-	// Relacions inverses (no guarden res a la taula de Partida)
 	@OneToMany(mappedBy = "partida")
 	private List<Jugador> jugadors = new ArrayList<>();
 
