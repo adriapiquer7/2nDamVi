@@ -37,7 +37,6 @@ import SpringROA.SpringROA.repository.JugadorRepository;
 import SpringROA.SpringROA.repository.PartidaRepository;
 import jakarta.persistence.EntityManager;
 
-/** Servei fort de la partida: iniciar, mostrar el tauler i tirar els daus (abans, PartidaDAO) */
 @Service
 public class PartidaService {
 
@@ -52,20 +51,16 @@ public class PartidaService {
 	private HexagonRepository hexagonRepository;
 	@Autowired
 	private AssentamentRepository assentamentRepository;
-	// Només per a TopologiaCSV (càrrega de la topologia des dels CSV)
 	@Autowired
 	private EntityManager entityManager;
 
-	/** Carrega una partida o llança un 404 */
 	private Partida carregarPartida(int idPartida) {
 		return partidaRepository.findById(idPartida)
 				.orElseThrow(() -> new JocException("No existeix la partida " + idPartida, HttpStatus.NOT_FOUND));
 	}
 
-	/** Crea una partida nova: jugadors, tauler, terrenys, números i lladre al desert */
 	@Transactional
 	public ResponseEntity<PartidaResposta> iniciarPartida(PartidaPeticio peticio) {
-		// 1 · Comprovar abans de modificar res
 		List<String> nomsJugadors = peticio.nomsJugadors();
 		if (nomsJugadors == null || nomsJugadors.size() < 2 || nomsJugadors.size() > 4) {
 			throw new JocException("Hi ha d'haver entre 2 i 4 jugadors", HttpStatus.BAD_REQUEST);
@@ -79,10 +74,8 @@ public class PartidaService {
 			throw new JocException("Els punts per guanyar han d'estar entre 2 i 50", HttpStatus.BAD_REQUEST);
 		}
 
-		// 2 · Modificar
 		Partida partida = partidaRepository.save(new Partida(punts));
 
-		// Ordre de torn aleatori; el color depèn de l'ordre de torn
 		List<String> barrejats = new ArrayList<>(noms);
 		Collections.shuffle(barrejats, random);
 		ColorJugador[] colors = ColorJugador.values();
@@ -92,7 +85,6 @@ public class PartidaService {
 		}
 		partida.setActiu(jugadors.get(0));
 
-		// Terrenys i números assignats aleatòriament
 		List<TipusTerreny> terrenys = new ArrayList<>();
 		afegir(terrenys, TipusTerreny.BOSC, 4);
 		afegir(terrenys, TipusTerreny.PASTURES, 4);
@@ -105,17 +97,14 @@ public class PartidaService {
 		List<Integer> numeros = new ArrayList<>(List.of(2, 3, 3, 4, 4, 5, 5, 6, 6, 8, 8, 9, 9, 10, 10, 11, 11, 12));
 		Collections.shuffle(numeros, random);
 
-		// Topologia des dels CSV
 		List<Hexagon> hexagons = TopologiaCSV.carregar(entityManager, partida, terrenys, numeros);
 
-		// El lladre comença al desert
 		Hexagon desert = hexagons.stream()
 				.filter(h -> h.getTerreny() == TipusTerreny.DESERT)
 				.findFirst()
 				.orElseThrow();
 		partida.setLladre(desert);
 
-		// 4 · Retornar el DTO, construït aquí dins
 		return ResponseEntity.status(HttpStatus.CREATED).body(PartidaResposta.de(partida, jugadors, hexagons));
 	}
 
@@ -125,7 +114,6 @@ public class PartidaService {
 		}
 	}
 
-	/** Hexàgons de la partida amb terreny, número, lladre i les construccions dels seus vèrtexs */
 	@Transactional(readOnly = true)
 	public ResponseEntity<List<TaulerHexagonResposta>> tauler(int idPartida) {
 		Partida p = carregarPartida(idPartida);
@@ -144,13 +132,8 @@ public class PartidaService {
 		return ResponseEntity.ok(resposta);
 	}
 
-	/**
-	 * Tira els daus i fa la producció. Per cada hexàgon amb el número (sense lladre),
-	 * cada poblat dona 1 recurs i cada ciutat 2 al propietari.
-	 */
 	@Transactional
 	public ResponseEntity<TiradaResposta> tirarDaus(int idPartida) {
-		// 1 · Comprovar
 		Partida p = carregarPartida(idPartida);
 		if (p.getEstat() != EstatPartida.EN_CURS) {
 			throw new JocException("Els daus només es tiren durant la partida (EN_CURS)");
@@ -162,18 +145,15 @@ public class PartidaService {
 			throw new JocException("Cal moure el lladre abans de continuar");
 		}
 
-		// 2 · Modificar
 		int d1 = random.nextInt(6) + 1;
 		int d2 = random.nextInt(6) + 1;
 		int total = d1 + d2;
 		p.setUltimaTirada(total);
 		p.setDausTirats(true);
 
-		// Els guanys es guarden per id de jugador (una sola entrada per jugador)
 		Map<Integer, Jugador> jugadors = new LinkedHashMap<>();
 		Map<Integer, Map<TipusRecurs, Integer>> guanys = new LinkedHashMap<>();
 
-		// Amb un 7 no hi ha producció (la part avançada del lladre no és en aquesta versió)
 		if (total != 7) {
 			for (Hexagon h : hexagonRepository.findByPartidaAndNumero(p, total)) {
 				if (p.getLladre() != null && p.getLladre().getId().equals(h.getId())) {
@@ -202,7 +182,6 @@ public class PartidaService {
 			resum.add(new GuanyResposta(j.getNom(), e.getValue()));
 		}
 
-		// 4 · Retornar el DTO
 		return ResponseEntity.ok(new TiradaResposta(d1, d2, total, resum));
 	}
 }
