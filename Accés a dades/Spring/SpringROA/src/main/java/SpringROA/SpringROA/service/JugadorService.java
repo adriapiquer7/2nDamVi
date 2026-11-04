@@ -32,7 +32,6 @@ import SpringROA.SpringROA.repository.JugadorRepository;
 import SpringROA.SpringROA.repository.PoblatRepository;
 import SpringROA.SpringROA.repository.VertexRepository;
 
-/** Servei fort del jugador: recursos, construir i passar torn (abans, JugadorDAO) */
 @Service
 public class JugadorService {
 
@@ -62,17 +61,11 @@ public class JugadorService {
 	@Autowired
 	private HexagonVertexRepository hexagonVertexRepository;
 
-	// ------------------------------------------------------------------
-	// Endpoints (mètodes públics: aquí hi ha el @Transactional)
-	// ------------------------------------------------------------------
-
-	/** Jugador amb el seu inventari; 404 si no existeix */
 	@Transactional(readOnly = true)
 	public ResponseEntity<JugadorRecursosResposta> recursos(int idJugador) {
 		return ResponseEntity.ok(JugadorRecursosResposta.de(carregarJugador(idJugador)));
 	}
 
-	/** Construeix una carretera, un poblat o una ciutat segons el tipus. Retorna un text amb el que passa. */
 	@Transactional
 	public ResponseEntity<String> construir(int idJugador, String tipus, int posicio) {
 		Jugador j = carregarJugador(idJugador);
@@ -87,7 +80,6 @@ public class JugadorService {
 		return ResponseEntity.status(HttpStatus.CREATED).body(resultat);
 	}
 
-	/** Passa el torn del jugador actiu al següent (seguint l'ordre de serp a la preparació) */
 	@Transactional
 	public ResponseEntity<String> passar(int idJugador) {
 		Jugador j = carregarJugador(idJugador);
@@ -111,7 +103,6 @@ public class JugadorService {
 				if (ordre < numJugadors) {
 					seguent = jugadorPerOrdre(p, ordre + 1);
 				} else {
-					// L'últim de la primera ronda juga també el primer de la segona
 					p.setRonda(2);
 					seguent = j;
 				}
@@ -119,7 +110,6 @@ public class JugadorService {
 				if (ordre > 1) {
 					seguent = jugadorPerOrdre(p, ordre - 1);
 				} else {
-					// Acaba la preparació: comença la partida
 					p.setEstat(EstatPartida.EN_CURS);
 					p.setRonda(1);
 					seguent = jugadorPerOrdre(p, 1);
@@ -129,7 +119,6 @@ public class JugadorService {
 			return ResponseEntity.ok("Torn passat. Ara juga " + seguent.getNom());
 		}
 
-		// EN_CURS
 		if (!p.isDausTirats()) {
 			throw new JocException("Has de tirar els daus abans de passar torn");
 		}
@@ -148,12 +137,6 @@ public class JugadorService {
 		return ResponseEntity.ok("Torn passat. Ara juga " + seguent.getNom() + " (ronda " + p.getRonda() + ")");
 	}
 
-	// ------------------------------------------------------------------
-	// Operacions de construcció (privades: formen part de la transacció del públic)
-	// Sempre es comprova TOT abans de modificar res.
-	// ------------------------------------------------------------------
-
-	/** Construeix una carretera. A preparació no es paga ni es comprova la connexió normal. */
 	private String construirCarretera(Jugador j, int idAresta) {
 		Partida p = validarTorn(j);
 
@@ -188,7 +171,6 @@ public class JugadorService {
 		return "Carretera construïda a l'aresta " + idAresta;
 	}
 
-	/** Construeix un poblat. Durant la preparació no es paga ni cal connexió. */
 	private String construirPoblat(Jugador j, int idVertex) {
 		Partida p = validarTorn(j);
 
@@ -217,7 +199,6 @@ public class JugadorService {
 		}
 
 		poblatRepository.save(new Poblat(j, v));
-		// Segon poblat de la preparació: 1 recurs per cada hexàgon que el toca
 		if (preparacio && poblats + 1 == 2) {
 			repartirRecursInicials(j, v);
 		}
@@ -225,7 +206,6 @@ public class JugadorService {
 		return "Poblat construït al vèrtex " + idVertex;
 	}
 
-	/** Substitueix un poblat propi per una ciutat */
 	private String millorarACiutat(Jugador j, int idVertex) {
 		Partida p = validarTorn(j);
 		if (p.getEstat() != EstatPartida.EN_CURS) {
@@ -244,15 +224,11 @@ public class JugadorService {
 
 		pagar(j, COST_CIUTAT);
 		poblatRepository.delete(poblat);
-		poblatRepository.flush(); // el vèrtex té un únic assentament: cal esborrar abans d'inserir
+		poblatRepository.flush(); 
 		ciutatRepository.save(new Ciutat(j, v));
 		comprovarVictoria(p);
 		return "Poblat millorat a ciutat al vèrtex " + idVertex;
 	}
-
-	// ------------------------------------------------------------------
-	// Ajudes
-	// ------------------------------------------------------------------
 
 	private Jugador carregarJugador(int idJugador) {
 		return jugadorRepository.findById(idJugador)
@@ -273,7 +249,6 @@ public class JugadorService {
 				() -> new JocException("No existeix el jugador amb ordre " + ordre, HttpStatus.INTERNAL_SERVER_ERROR));
 	}
 
-	/** Comprova que la partida és activa i que és el torn del jugador. Retorna la partida. */
 	private Partida validarTorn(Jugador j) {
 		Partida p = j.getPartida();
 		if (p.getEstat() == EstatPartida.FINALITZADA) {
@@ -293,7 +268,6 @@ public class JugadorService {
 		return p;
 	}
 
-	/** Descompta els recursos del cost, o llança error si no n'hi ha prou */
 	private void pagar(Jugador j, Map<TipusRecurs, Integer> cost) {
 		for (Map.Entry<TipusRecurs, Integer> e : cost.entrySet()) {
 			if (j.getQuantitat(e.getKey()) < e.getValue()) {
@@ -305,7 +279,6 @@ public class JugadorService {
 		}
 	}
 
-	/** Connexió normal: una aresta toca un assentament o una carretera del mateix jugador */
 	private boolean connectadaAmbPropi(Jugador j, Aresta a) {
 		for (Vertex v : List.of(a.getVertexA(), a.getVertexB())) {
 			if (assentamentRepository.countByPropietariAndVertex(j, v) > 0
@@ -316,14 +289,12 @@ public class JugadorService {
 		return false;
 	}
 
-	/** En preparació: la carretera ha de tocar un poblat propi que encara no tingui cap carretera */
 	private boolean tocaPoblatSenseCarreteraPreparacio(Jugador j, Aresta a) {
 		List<Vertex> lliures = assentamentRepository.vertexsSenseCarretera(j);
 		return lliures.stream().anyMatch(v -> v.getId().equals(a.getVertexA().getId())
 				|| v.getId().equals(a.getVertexB().getId()));
 	}
 
-	/** Quan el jugador col·loca el seu segon poblat de la preparació, rep 1 recurs per hexàgon adjacent */
 	private void repartirRecursInicials(Jugador j, Vertex v) {
 		for (Hexagon h : hexagonVertexRepository.hexagonsDelVertex(v)) {
 			TipusRecurs recurs = h.getTerreny().getRecurs();
@@ -333,12 +304,10 @@ public class JugadorService {
 		}
 	}
 
-	/** Punts de victòria: 1 per poblat, 2 per ciutat */
 	private int calcularPunts(Jugador j) {
 		return (int) (poblatRepository.countByPropietari(j) + 2 * ciutatRepository.countByPropietari(j));
 	}
 
-	/** Si algun jugador arriba als punts per guanyar, la partida acaba */
 	private void comprovarVictoria(Partida p) {
 		if (p.getEstat() != EstatPartida.EN_CURS) {
 			return;
