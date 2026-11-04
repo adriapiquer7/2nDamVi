@@ -21,6 +21,7 @@ public class Vertex {
 	@Column(name = "id")
 	private Integer id;
 
+	/** Id que té el vèrtex al CSV */
 	@NotNull
 	@Column(name = "codi", nullable = false)
 	private Integer codi;

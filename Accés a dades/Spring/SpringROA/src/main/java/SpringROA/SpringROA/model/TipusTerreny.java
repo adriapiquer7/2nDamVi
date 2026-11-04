@@ -13,7 +13,8 @@ public enum TipusTerreny {
 	TipusTerreny(TipusRecurs recurs) {
 		this.recurs = recurs;
 	}
-	
+
+	/** Recurs que produeix el terreny, o null pel desert. */
 	public TipusRecurs getRecurs() {
 		return recurs;
 	}

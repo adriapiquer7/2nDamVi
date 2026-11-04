@@ -13,6 +13,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 
+/** Carta de desenvolupament (part avançada). Mentre és a la pila, jugador és null. */
 @Entity
 @Table(name = "CartaDesenvolupament")
 public class CartaDesenvolupament {

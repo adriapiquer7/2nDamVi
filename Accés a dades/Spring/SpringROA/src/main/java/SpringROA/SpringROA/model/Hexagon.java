@@ -25,6 +25,7 @@ public class Hexagon {
 	@Column(name = "id")
 	private Integer id;
 
+	/** Id que té l'hexàgon al CSV */
 	@NotNull
 	@Column(name = "codi", nullable = false)
 	private Integer codi;
@@ -34,11 +35,13 @@ public class Hexagon {
 	@Column(name = "terreny", nullable = false, length = 10)
 	private TipusTerreny terreny;
 
+	/** Null al desert */
 	@Min(value = 2, message = "El número mínim és 2")
 	@Max(value = 12, message = "El número màxim és 12")
 	@Column(name = "numero")
 	private Integer numero;
 
+	/** Coordenades axials (informatives). Poden ser negatives. */
 	@NotNull
 	@Column(name = "q", nullable = false)
 	private Integer q;

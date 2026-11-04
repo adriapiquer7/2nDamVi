@@ -35,34 +35,15 @@ public class PartidaService{
 	@Autowired
 	private PartidaRepository partidaRepository;
 	@Autowired
-<<<<<<< Updated upstream
 	private EntityManager entityManager;
 	@Autowired
 	private ArestaRepository arestaRepository;
 	private static final int PUNTS_PER_DEFECTE = 10;
 	private final Random random = new Random();
-=======
-	private JugadorRepository jugadorRepository;
-	@Autowired
-	private HexagonRepository hexagonRepository;
-	@Autowired
-	private AssentamentRepository assentamentRepository;
-	@Autowired
-	private EntityManager entityManager;
 
-	private Partida carregarPartida(int idPartida) {
-		return partidaRepository.findById(idPartida)
-				.orElseThrow(() -> new JocException("No existeix la partida " + idPartida, HttpStatus.NOT_FOUND));
-	}
->>>>>>> Stashed changes
-
+	/** Crea una partida nova: jugadors, tauler, terrenys, números i lladre al desert */
 	@Transactional
-<<<<<<< Updated upstream
 	public int iniciarPartida(List<String> nomsJugadors, Integer puntsPerGuanyar) {
-=======
-	public ResponseEntity<PartidaResposta> iniciarPartida(PartidaPeticio peticio) {
-		List<String> nomsJugadors = peticio.nomsJugadors();
->>>>>>> Stashed changes
 		if (nomsJugadors == null || nomsJugadors.size() < 2 || nomsJugadors.size() > 4) {
 			throw new JocException("Hi ha d'haver entre 2 i 4 jugadors");
 		}
@@ -72,7 +53,6 @@ public class PartidaService{
 		}
 		int punts = puntsPerGuanyar == null ? PUNTS_PER_DEFECTE : puntsPerGuanyar;
 
-<<<<<<< Updated upstream
 		return executar(s -> {
 			Partida partida = new Partida(punts);
 			s.persist(partida);
@@ -86,59 +66,6 @@ public class PartidaService{
 				Jugador j = new Jugador(partida, barrejats.get(i), colors[i], i + 1);
 				s.persist(j);
 				jugadors.add(j);
-=======
-		Partida partida = partidaRepository.save(new Partida(punts));
-
-		List<String> barrejats = new ArrayList<>(noms);
-		Collections.shuffle(barrejats, random);
-		ColorJugador[] colors = ColorJugador.values();
-		List<Jugador> jugadors = new ArrayList<>();
-		for (int i = 0; i < barrejats.size(); i++) {
-			jugadors.add(jugadorRepository.save(new Jugador(partida, barrejats.get(i), colors[i], i + 1)));
-		}
-		partida.setActiu(jugadors.get(0));
-
-		List<TipusTerreny> terrenys = new ArrayList<>();
-		afegir(terrenys, TipusTerreny.BOSC, 4);
-		afegir(terrenys, TipusTerreny.PASTURES, 4);
-		afegir(terrenys, TipusTerreny.CAMPS, 4);
-		afegir(terrenys, TipusTerreny.TURONS, 3);
-		afegir(terrenys, TipusTerreny.MUNTANYES, 3);
-		afegir(terrenys, TipusTerreny.DESERT, 1);
-		Collections.shuffle(terrenys, random);
-
-		List<Integer> numeros = new ArrayList<>(List.of(2, 3, 3, 4, 4, 5, 5, 6, 6, 8, 8, 9, 9, 10, 10, 11, 11, 12));
-		Collections.shuffle(numeros, random);
-
-		List<Hexagon> hexagons = TopologiaCSV.carregar(entityManager, partida, terrenys, numeros);
-
-		Hexagon desert = hexagons.stream()
-				.filter(h -> h.getTerreny() == TipusTerreny.DESERT)
-				.findFirst()
-				.orElseThrow();
-		partida.setLladre(desert);
-
-		return ResponseEntity.status(HttpStatus.CREATED).body(PartidaResposta.de(partida, jugadors, hexagons));
-	}
-
-	private static void afegir(List<TipusTerreny> llista, TipusTerreny terreny, int quantitat) {
-		for (int i = 0; i < quantitat; i++) {
-			llista.add(terreny);
-		}
-	}
-
-	@Transactional(readOnly = true)
-	public ResponseEntity<List<TaulerHexagonResposta>> tauler(int idPartida) {
-		Partida p = carregarPartida(idPartida);
-		Integer idLladre = p.getLladre() == null ? null : p.getLladre().getId();
-
-		List<TaulerHexagonResposta> resposta = new ArrayList<>();
-		for (Hexagon h : hexagonRepository.findByPartidaOrderByCodi(p)) {
-			List<ConstruccioResposta> construccions = new ArrayList<>();
-			for (Assentament a : assentamentRepository.assentamentsDelHexagon(h)) {
-				String tipus = a instanceof Ciutat ? "CIUTAT" : "POBLAT";
-				construccions.add(new ConstruccioResposta(a.getVertex().getId(), tipus, a.getPropietari().getNom()));
->>>>>>> Stashed changes
 			}
 			partida.setActiu(jugadors.get(0));
 
@@ -203,8 +130,11 @@ public class PartidaService{
 		});
 	}
 
+	/**
+	 * Tira els daus i fa la producció. Per cada hexàgon amb el número (sense lladre),
+	 * cada poblat dona 1 recurs i cada ciutat 2 al propietari.
+	 */
 	@Transactional
-<<<<<<< Updated upstream
 	public String tirarDaus(int idPartida) {
 		return executar(s -> {
 			Partida p = Consultes.carregarPartida(s, idPartida);
@@ -235,31 +165,6 @@ public class PartidaService{
 					.setParameter("p", p).setParameter("n", total).getResultList();
 
 			for (Hexagon h : hexagons) {
-=======
-	public ResponseEntity<TiradaResposta> tirarDaus(int idPartida) {
-		Partida p = carregarPartida(idPartida);
-		if (p.getEstat() != EstatPartida.EN_CURS) {
-			throw new JocException("Els daus només es tiren durant la partida (EN_CURS)");
-		}
-		if (p.isDausTirats()) {
-			throw new JocException("El jugador actiu ja ha tirat els daus en aquest torn");
-		}
-		if (p.isLladrePendent()) {
-			throw new JocException("Cal moure el lladre abans de continuar");
-		}
-
-		int d1 = random.nextInt(6) + 1;
-		int d2 = random.nextInt(6) + 1;
-		int total = d1 + d2;
-		p.setUltimaTirada(total);
-		p.setDausTirats(true);
-
-		Map<Integer, Jugador> jugadors = new LinkedHashMap<>();
-		Map<Integer, Map<TipusRecurs, Integer>> guanys = new LinkedHashMap<>();
-
-		if (total != 7) {
-			for (Hexagon h : hexagonRepository.findByPartidaAndNumero(p, total)) {
->>>>>>> Stashed changes
 				if (p.getLladre() != null && p.getLladre().getId().equals(h.getId())) {
 					continue;
 				}
@@ -285,17 +190,10 @@ public class PartidaService{
 				}
 				sb.append(e.getKey().getNom()).append(':').append(linia).append('\n');
 			}
-<<<<<<< Updated upstream
 			if (guanys.isEmpty()) {
 				sb.append("Ningú no rep recursos.\n");
 			}
 			return sb.toString().trim();
 		});
-=======
-			resum.add(new GuanyResposta(j.getNom(), e.getValue()));
-		}
-
-		return ResponseEntity.ok(new TiradaResposta(d1, d2, total, resum));
->>>>>>> Stashed changes
 	}
 }
