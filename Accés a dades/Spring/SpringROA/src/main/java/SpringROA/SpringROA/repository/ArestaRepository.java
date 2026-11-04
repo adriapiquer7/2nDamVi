@@ -10,6 +10,7 @@ import SpringROA.SpringROA.model.Aresta;
 
 public interface ArestaRepository extends JpaRepository<Aresta, Integer> {
 
+	/** Ids de les arestes que toquen un vèrtex */
 	@Query("SELECT ar.id FROM Aresta ar WHERE ar.vertexA.id = :v OR ar.vertexB.id = :v")
 	List<Integer> idsAdjacents(@Param("v") int idVertex);
 }

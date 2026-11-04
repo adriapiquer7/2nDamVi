@@ -4,6 +4,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import SpringROA.SpringROA.model.Partida;
 
-public interface PartidaRepository extends JpaRepository<Partida, Integer>{
-	
+public interface PartidaRepository extends JpaRepository<Partida, Integer> {
 }

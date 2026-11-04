@@ -9,16 +9,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.Session;
+import jakarta.persistence.EntityManager;
 
 import SpringROA.SpringROA.exception.JocException;
-import SpringROA.SpringROA.model.Aresta;
-import SpringROA.SpringROA.model.Hexagon;
-import SpringROA.SpringROA.model.HexagonVertex;
-import SpringROA.SpringROA.model.Partida;
-import SpringROA.SpringROA.model.TipusTerreny;
-import SpringROA.SpringROA.model.Vertex;
-import jakarta.persistence.EntityManager;
+import SpringROA.SpringROA.model.*;
 
 /**
  * Carrega la topologia del tauler des dels CSV de la carpeta "csv" (a l'arrel del projecte).
