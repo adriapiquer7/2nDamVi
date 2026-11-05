@@ -1,4 +1,5 @@
 import {personatge} from "./Personatge.js";
+
 export class mag extends personatge{
     private _poderMagic : string;
 

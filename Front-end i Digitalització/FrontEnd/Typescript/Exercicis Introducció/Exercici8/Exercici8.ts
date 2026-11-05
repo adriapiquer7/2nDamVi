@@ -24,7 +24,7 @@ function colorAleatori(){
     let num1 : number = random(255)
     let num2 : number = random(255)
     let num3 : number = random(255)
-     cercle.style.backgroundColor = `rgb(${num1}, ${num2}, ${num3})`;
+    cercle.style.backgroundColor = `rgb(${num1}, ${num2}, ${num3})`;
 }
 
 function random(max : number) {

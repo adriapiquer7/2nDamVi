@@ -1,5 +1,6 @@
+"use strict";
 function canviColor() {
-    var quadrat = document.getElementById("quadrat");
+    let quadrat = document.getElementById("quadrat");
     if (quadrat.classList.contains("classe1")) {
         quadrat.classList.remove("classe1");
     }
@@ -7,3 +8,4 @@ function canviColor() {
         quadrat.classList.add("classe1");
     }
 }
+//# sourceMappingURL=Exercici9.js.map

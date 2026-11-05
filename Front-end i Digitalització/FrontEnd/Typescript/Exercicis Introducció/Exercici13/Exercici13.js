@@ -1,9 +1,10 @@
-var p = document.getElementById("resultat");
-var arrayVehicles = [];
+"use strict";
+let p = document.getElementById("resultat");
+let arrayVehicles = [];
 function mostrar() {
     p.innerText = "Mostrant les dades";
-    for (var i = 0; i < arrayVehicles.length; i++) {
-        var vehicle = arrayVehicles[i];
+    for (let i = 0; i < arrayVehicles.length; i++) {
+        let vehicle = arrayVehicles[i];
         if ("carrega" in vehicle) {
             p.innerText = "Fabricant:" + vehicle.fabricant + ", Model: " + vehicle.model + ", Temps de carrega: " + vehicle.carrega;
             p.innerHTML = "<br>";
@@ -15,19 +16,19 @@ function mostrar() {
     }
 }
 function guardar() {
-    var fabricant = document.getElementById("fabricant");
-    var model = document.getElementById("model");
-    var tipus = document.getElementById("tipus");
-    var carrega = document.getElementById("carrega");
+    let fabricant = document.getElementById("fabricant");
+    let model = document.getElementById("model");
+    let tipus = document.getElementById("tipus");
+    let carrega = document.getElementById("carrega");
     if (tipus.selectedIndex === 0) {
-        var bici = {
+        let bici = {
             fabricant: fabricant.value,
             model: model.value
         };
         arrayVehicles.push(bici);
     }
     else {
-        var pati = {
+        let pati = {
             fabricant: fabricant.value,
             model: model.value,
             carrega: carrega.valueAsNumber
@@ -36,3 +37,4 @@ function guardar() {
     }
     p.innerText = "S'han guardat les dades";
 }
+//# sourceMappingURL=Exercici13.js.map

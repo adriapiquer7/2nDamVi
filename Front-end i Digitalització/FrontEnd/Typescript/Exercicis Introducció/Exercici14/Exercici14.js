@@ -1,11 +1,9 @@
-"use strict";
 function ActColor() {
-    let mostraColor = document.getElementById("mostraColor");
-    let vermell = document.getElementById("vermell").valueAsNumber;
-    let verd = document.getElementById("verd").valueAsNumber;
-    let blau = document.getElementById("blau").valueAsNumber;
-    let arrayTupla = [vermell, verd, blau];
-    mostraColor.innerText = `rgb(${arrayTupla[0]},${arrayTupla[1]},${arrayTupla[2]})`;
-    mostraColor.style.backgroundColor = `rgb(${arrayTupla[0]},${arrayTupla[1]},${arrayTupla[2]})`;
+    var mostraColor = document.getElementById("mostraColor");
+    var vermell = document.getElementById("vermell").valueAsNumber;
+    var verd = document.getElementById("verd").valueAsNumber;
+    var blau = document.getElementById("blau").valueAsNumber;
+    var arrayTupla = [vermell, verd, blau];
+    mostraColor.innerText = "rgb(".concat(arrayTupla[0], ",").concat(arrayTupla[1], ",").concat(arrayTupla[2], ")");
+    mostraColor.style.backgroundColor = "rgb(".concat(arrayTupla[0], ",").concat(arrayTupla[1], ",").concat(arrayTupla[2], ")");
 }
-//# sourceMappingURL=Exercici14.js.map
